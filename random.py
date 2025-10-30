@@ -16,8 +16,6 @@ dev = requests.get(
 for i in json.loads(dev.content)["data"]:
     shocker.append(i["id"])
 
-print(shocker)
-
 winner = random.choice(shocker)
 
 requests.post(
