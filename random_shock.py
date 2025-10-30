@@ -27,7 +27,7 @@ requests.post(
     json=[
       {
         "id": winner,
-        "type": "shock",
+        "type": "vibrate",
         "intensity": 5,
         "duration": 300,
         "exclusive": True
