@@ -57,6 +57,7 @@ async function shock_spinning_wheel(collar_list, shock_percentage, duration) {
     }
 
     sound_person(unmuted[random_number % unmuted.length], 100, 600)
+    await wait(500)
     shock_person(unmuted[random_number % unmuted.length], shock_percentage, duration)
 }
 

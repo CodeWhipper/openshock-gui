@@ -42,8 +42,8 @@
 
 .half-screen-btn {
   margin: 0.5vw;
-  width: 49vw;      /* 50% der Bildschirmbreite */
-  height: 49vw;     /* 50% der Bildschirmhöhe */
+  width: 48vw;      /* 50% der Bildschirmbreite */
+  height: 48vw;     /* 50% der Bildschirmhöhe */
   font-size: 2rem;
   cursor: pointer;
 }
