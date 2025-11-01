@@ -1,6 +1,6 @@
 GUI:
-- [ ] Grundgerüst
-- [ ] Funktionalitätsauswahl
+- [X] Grundgerüst
+- [X] Funktionalitätsauswahl
 - [ ] Shocker einzeleinstellungen
 
 
@@ -8,7 +8,10 @@ GUI:
 
 Funktionalität:
 - [ ] Einzelauswah
-- [ ] Alle schocken
-- [ ] Random shock
+- [X] Alle schocken
+- [X] Random shock
 - [ ] Random Stärke
-- [ ] Prozentueler shock mit hächsteinstellungen pro person
+- [X] Prozentueler shock 
+- [X] hächsteinstellungen pro person
+- [X] vibration & ton
+- [X] stop

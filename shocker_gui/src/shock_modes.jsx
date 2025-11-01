@@ -23,6 +23,12 @@ function shock_random(collar_list, shock_percentage, duration) {
     shock_person(unmuted[random_number], shock_percentage, duration)
 }
 
+function stop_all(collar_list){
+    for (let i = 0; i < collar_list.length; i++) {
+        shock_person(collar_list[i], 0, 300)
+    }
+}
+
 function get_unmuted(collar_list) {
     return collar_list.filter(c => !c.mute);
 }

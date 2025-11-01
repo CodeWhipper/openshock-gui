@@ -46,6 +46,9 @@ function App() {
     shock_all(collars, percentage, duration)
   }
 
+  const handle_btn_Stop_All = () => {
+    shock_all(collars,)
+
   return (
     <div style={{ width: "1 vw" }}>
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6 space-y-10">
@@ -62,7 +65,14 @@ function App() {
           />
           <p className="mt-4 text-lg">
             Aktueller Wert:{" "}
-            <span className="font-bold text-blue-600">{percentage}</span>
+            <input
+              type="number"
+              min="1"
+              max="100"
+              value={percentage}
+              onChange={(e) => setpercentage(e.target.value)}
+              className="font-bold text-blue-600 text-center w-16 border-b-2 border-blue-300 outline-none"
+            />
           </p>
         </div>
 
@@ -79,7 +89,15 @@ function App() {
           />
           <p className="mt-4 text-lg">
             Aktuelle Duration:{" "}
-            <span className="font-bold text-blue-600">{duration / 1000}</span> s
+            <input
+              type="number"
+              min="300"
+              max="30000"
+              value={duration / 1000}
+              onChange={(e) => setduration(e.target.value * 1000)}
+              className="font-bold text-blue-600 text-center w-20 border-b-2 border-blue-300 outline-none"
+            />{" "}
+            s
           </p>
         </div>
       </div>
@@ -100,7 +118,7 @@ function App() {
       </div>
       <button className='half-screen-btn' onClick={handle_btn_All}>All</button>
       <button className='half-screen-btn' onClick={handle_btn_Random}>Random</button>
-
+      <button className='half-screen-btn' onClick={handle_btn_Stop_All}>STOP</button>
     </div>
 
   )
