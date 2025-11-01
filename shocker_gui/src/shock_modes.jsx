@@ -5,8 +5,8 @@ import { Collarmodes } from "./utils/collar_modes.js"
 
 function shock_person(collar, shock_percentage, duration = 300) {
     if (!collar.mute) {
-        console.log("shocking!!! "+ collar.name);
         const intensity = Math.floor((shock_percentage / 100) * collar.max_shock)
+        console.log("shocking!!! "+ collar.name +" intensity: " + intensity);
         control_collar(collar.id, Collarmodes.SHOCK, intensity, duration)
     }
 }
