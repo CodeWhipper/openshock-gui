@@ -48,6 +48,7 @@ function App() {
 
   const handle_btn_Stop_All = () => {
     shock_all(collars,)
+  }
 
   return (
     <div style={{ width: "1 vw" }}>
