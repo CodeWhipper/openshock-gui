@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { get_shockers, control_collar, get_hub_id } from './Api_calls/Api_calls.jsx'
-import { shock_all, shock_person, shock_random } from "./shock_modes.jsx"
+import { shock_all, shock_person, shock_random, shock_spinning_wheel} from "./shock_modes.jsx"
 import { socket } from "./socket";
 
 
@@ -44,6 +44,9 @@ function App() {
 
   const handle_btn_All = () => {
     shock_all(collars, percentage, duration)
+  }
+  const handle_btn_Wheel = () => {
+    shock_spinning_wheel(collars, percentage, duration)
   }
 
   return (
@@ -100,6 +103,7 @@ function App() {
       </div>
       <button className='half-screen-btn' onClick={handle_btn_All}>All</button>
       <button className='half-screen-btn' onClick={handle_btn_Random}>Random</button>
+      <button className='half-screen-btn' onClick={handle_btn_Wheel}>Wheel of pain</button>
 
     </div>
 
