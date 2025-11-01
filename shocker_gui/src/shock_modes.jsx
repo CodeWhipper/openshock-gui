@@ -36,6 +36,12 @@ function shock_random(collar_list, shock_percentage, duration) {
     shock_person(unmuted[random_number], shock_percentage, duration)
 }
 
+function stop_all(collar_list){
+    for (let i = 0; i < collar_list.length; i++) {
+        shock_person(collar_list[i], 0, 300)
+    }
+}
+
 async function shock_spinning_wheel(collar_list, shock_percentage, duration) {
     const unmuted = get_unmuted(collar_list)
     const random_number = Math.floor(Math.random() * unmuted.length * 3) + 3
@@ -59,4 +65,4 @@ function get_unmuted(collar_list) {
 }
 //function shock_random(collars ,intensity = 10, duration = 300)
 
-export { shock_all, shock_person, shock_random, shock_spinning_wheel }
+export { shock_all, shock_person, shock_random, shock_spinning_wheel, stop_all }
