@@ -1,4 +1,7 @@
 import { io } from "socket.io-client";
-export const socket = io("http://192.168.0.100:4000", {
+const host = import.meta.env.VITE_HOST;
+const port = import.meta.env.VITE_PORT;
+
+export const socket = io("http://${host}:${port}", {
   transports: ["websocket"],
 });
