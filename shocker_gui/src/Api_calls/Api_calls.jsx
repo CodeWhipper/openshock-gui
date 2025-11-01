@@ -32,7 +32,7 @@ async function get_shockers() {
     const url = 'https://api.openshock.app/1/devices/' + hub_id + '/shockers'
     const respose = await make_api_call(url, null)
     const shockers = respose.data
-    console.log(shockers);
+    return shockers;
     
 }
 
@@ -62,4 +62,4 @@ async function control_collar(shocker_id, type, intensity, duration) {
     await make_api_call('https://api.openshock.app/1/shockers/control', body)
 }
 
-export { get_shockers, control_collar }
+export { get_shockers, control_collar, get_hub_id}

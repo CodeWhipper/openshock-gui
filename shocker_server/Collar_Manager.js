@@ -5,6 +5,18 @@ class CollarManager {
         this.collarlist = [];
     }
 
+    upsertCollar(data) {
+        const existing = this.collarlist.find(c => c.get_id() === data.id);
+        if (existing) {
+            // Optional: Update bestehender Daten, z.B. Name
+            existing.name = data.name; 
+            // andere Felder kannst du hier auch aktualisieren, z.B. max_shock
+        } else {
+            const collar = new Collar(data.id, data.name);
+            this.collarlist.push(collar);
+        }
+    }
+
     add_collar(input) {
         const collar = new Collar(input.id, input.name);
         this.collarlist.push(collar);
