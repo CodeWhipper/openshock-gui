@@ -46,23 +46,24 @@ function App() {
 
   return (
     <div style={{ width: "1 vh" }}>
-      <button className='half-screen-btn' onClick={handle_btn_All}>All</button>
-      <button className='half-screen-btn' onClick={handle_btn_Random}>Random</button>
-      <div style={{ padding: "2rem" }}>
+      <div >
         <h1>Collar Manager</h1>
         <ul>
           {collars.map((c) => (
-            <li key={c.id}>
-              <b>{c.name}</b> — Shock: {c.max_shock} — Mute: {c.mute ? "🔇" : "🔊"}
-              <button onClick={() => toggleMute(c.id, c.mute)}>
+            <li style={{padding: "5px"}} key={c.id}>
+              <b style={{marginRight : "10px"}}>{c.name} — Shock max: {c.max_shock} — Mute: {c.mute ? "🔇" : "🔊"} </b>
+              <button style={{marginRight : "10px"}} onClick={() => toggleMute(c.id, c.mute)}>
                 {c.mute ? "Unmute" : "Mute"}
               </button>
-              <button onClick={() => setShock(c.id)}>Set Shock</button>
-              <button  onClick={() => shock_person(c, 50, 500)}>Shock {c.name}</button >
+              <button  style={{marginRight : "10px"}} onClick={() => setShock(c.id)}>Set Shock Maximum </button>
+              <button style={{marginRight : "10px"}} onClick={() => shock_person(c, 50, 500)}>Shock {c.name}</button >
             </li>
           ))}
         </ul>
       </div>
+      <button className='half-screen-btn' onClick={handle_btn_All}>All</button>
+      <button className='half-screen-btn' onClick={handle_btn_Random}>Random</button>
+      
     </div>
 
   )
