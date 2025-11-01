@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { get_shockers, control_collar, get_hub_id } from './Api_calls/Api_calls.jsx'
-import { shock_all } from "./shock_modes.jsx"
+import { shock_all, shock_random } from "./shock_modes.jsx"
 import { socket } from "./socket";
 
 
@@ -39,10 +39,20 @@ function App() {
     socket.emit("addCollar", { id: Date.now(), name });
   };
 
+  //todo erstezen von 50 und 30 durch prozente  prozente 1 -100 und duration 300 - 100000
+
+  const handle_btn_Random = () => {
+    shock_random(collars, 500)
+  }
+
+  const handle_btn_All =() => {
+    shock_all(collars, 50, 500)
+  }
+
   return (
     <div style={{ width: "1 vh" }}>
-      <button className='half-screen-btn' onClick={control_collar}>All</button>
-      <button className='half-screen-btn' onClick={control_collar}>Random</button>
+      <button className='half-screen-btn' onClick={handle_btn_All}>All</button>
+      <button className='half-screen-btn' onClick={handle_btn_Random}>Random</button>
       <div style={{ padding: "2rem" }}>
         <h1>Collar Manager</h1>
         <button onClick={addCollar}>+ Add Collar</button>

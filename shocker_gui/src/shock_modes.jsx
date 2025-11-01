@@ -5,8 +5,9 @@ import { Collarmodes } from "./utils/collar_modes.js"
 
 function shock_person(collar, shock_percentage, duration = 300) {
     if (!collar.mute) {
-        const intensity = int((shock_percentage / 100) * collar.max_shock)
-        control_collar(collars.id, Collarmodes.SHOCK, intensity, duration)
+        console.log("shocking!!! "+ collar.name);
+        const intensity = Math.floor((shock_percentage / 100) * collar.max_shock)
+        control_collar(collar.id, Collarmodes.SHOCK, intensity, duration)
     }
 }
 
@@ -18,12 +19,12 @@ function shock_all(collar_list, shock_percentage, duration = 300) {
 
 function shock_random(collar_list, shock_percentage, duration) {
     let unmuted = get_unmuted(collar_list)
-    const random_number = Math.floor(Math.random() * unmuted.length)
+    const random_number = Math.floor(Math.random() * unmuted.length)   
     shock_person(unmuted[random_number], shock_percentage, duration)
 }
 
 function get_unmuted(collar_list) {
-    return collar_list.filter(c => !c.get_mute());
+    return collar_list.filter(c => !c.mute);
 }
 //function shock_random(collars ,intensity = 10, duration = 300)
 

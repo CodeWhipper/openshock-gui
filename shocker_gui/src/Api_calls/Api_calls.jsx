@@ -37,22 +37,10 @@ async function get_shockers() {
 }
 
 async function control_collar(shocker_id, type, intensity, duration) {
-    shocker_id = '019a39de-41f1-7497-9437-84f50c97eb9f'
-    type = 'Vibrate'
-    intensity = 60
-    duration = 300
     const body = [
         {
             id: shocker_id,
             type: type,
-            intensity: intensity,
-            duration: duration,
-            exclusive: true
-        }
-        ,
-        {
-            id: '019a39de-8801-7a5d-9d12-95b51a916133',
-            type: 'Sound',
             intensity: intensity,
             duration: duration,
             exclusive: true
