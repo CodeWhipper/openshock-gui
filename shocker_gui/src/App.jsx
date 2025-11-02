@@ -122,11 +122,12 @@ function App() {
           ))}
         </ul>
       </div>
-      <button className='half-screen-btn' onClick={handle_btn_All}>All</button>
-      <button className='half-screen-btn' onClick={handle_btn_Random}>Random</button>
-      <button className='half-screen-btn' onClick={handle_btn_Wheel}>Wheel of pain</button>
-      <button className='half-screen-btn' onClick={handle_btn_Stop_All}>STOP</button>      
-
+        <div style={{display: "grid", gridTemplateColumns: "1fr 1fr"}}>
+            <button className='half-screen-btn' onClick={handle_btn_All}>All</button>
+            <button className='half-screen-btn' onClick={handle_btn_Random}>Random</button>
+            <button className='half-screen-btn' onClick={handle_btn_Wheel}>Wheel of pain</button>
+            <button className='half-screen-btn' onClick={handle_btn_Stop_All}>STOP</button>
+        </div>
     </div>
 
   )
