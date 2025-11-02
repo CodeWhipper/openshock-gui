@@ -11,6 +11,11 @@ function shock_person(collar, shock_percentage, duration = 300) {
     }
 }
 
+function stop_person(collar) {
+    console.log("shocking!!! " + collar.name);
+    control_collar(collar.id, Collarmodes.STOP, 100, 300)
+}
+
 function vibrate_person(collar, intensity, duration = 300) {
     if (!collar.mute) {
         console.log("Vibrating!!! " + collar.name + " intensity: " + intensity);
@@ -38,7 +43,7 @@ function shock_random(collar_list, shock_percentage, duration) {
 
 function stop_all(collar_list){
     for (let i = 0; i < collar_list.length; i++) {
-        shock_person(collar_list[i], 0, 300)
+        stop_person(collar_list[i])
     }
 }
 
@@ -66,4 +71,4 @@ function get_unmuted(collar_list) {
 }
 //function shock_random(collars ,intensity = 10, duration = 300)
 
-export { shock_all, shock_person, shock_random, shock_spinning_wheel, stop_all }
+export { shock_all, shock_person, shock_random, vibrate_person, sound_person, shock_spinning_wheel, stop_all }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { get_shockers, control_collar, get_hub_id } from './Api_calls/Api_calls.jsx'
-import { shock_all, shock_person, shock_random, shock_spinning_wheel} from "./shock_modes.jsx"
+import { shock_all, stop_all, shock_person, shock_random, vibrate_person, sound_person, shock_spinning_wheel} from "./shock_modes.jsx"
 import { socket } from "./socket";
 
 
@@ -47,7 +47,7 @@ function App() {
   }
 
   const handle_btn_Stop_All = () => {
-    shock_all(collars,)
+    stop_all(collars)
   }
   const handle_btn_Wheel = () => {
     shock_spinning_wheel(collars, percentage, duration)
@@ -114,8 +114,10 @@ function App() {
               <button style={{ marginRight: "10px" }} onClick={() => toggleMute(c.id, c.mute)}>
                 {c.mute ? "Unmute" : "Mute"}
               </button>
-              <button style={{ marginRight: "10px" }} onClick={() => setShock(c.id)}>Set Shock Maximum </button>
-              <button style={{ marginRight: "10px" }} onClick={() => shock_person(c, percentage, duration)}>Shock {c.name}</button >
+              <button style={{ marginRight: "10px", marginTop:"10px" }} onClick={() => setShock(c.id)}>Set Shock Maximum </button>
+              <button style={{ marginRight: "10px", marginTop:"10px" }} onClick={() => shock_person(c, percentage, duration)}>Shock {c.name}</button >
+              <button style={{ marginRight: "10px", marginTop:"10px" }} onClick={() => vibrate_person(c, percentage, duration)}>Vibrate {c.name}</button >
+              <button style={{ marginRight: "10px", marginTop:"10px" }} onClick={() => sound_person(c, percentage, duration)}>Sound {c.name}</button >
             </li>
           ))}
         </ul>
