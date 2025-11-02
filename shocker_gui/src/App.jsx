@@ -3,19 +3,30 @@ import './App.css'
 import { get_shockers, control_collar, get_hub_id } from './Api_calls/Api_calls.jsx'
 import { shock_all, stop_all, shock_person, shock_random, vibrate_person, sound_person, shock_spinning_wheel} from "./shock_modes.jsx"
 import { socket } from "./socket";
+import { setTestingMode, getTestingMode } from "./utils/testing_mode.js";
 
 
 function App() {
   const [collars, setCollars] = useState([]);
   const [percentage, setpercentage] = useState(50);
   const [duration, setduration] = useState(300);
+  const [isTesting, setIsTesting] = useState(false);
 
   useEffect(() => {
     socket.on("update", (data) => {
       setCollars(data);
     });
 
-    return () => socket.off("update");
+    // Listen for testing mode from server
+    socket.on("testingMode", (testing) => {
+      setTestingMode(testing);
+      setIsTesting(testing);
+    });
+
+    return () => {
+      socket.off("update");
+      socket.off("testingMode");
+    };
   }, []);
 
   const toggleMute = (id, mute) => {
@@ -24,8 +35,11 @@ function App() {
 
   useEffect(() => {
     const sync = async () => {
-      const shockers = await get_shockers()
-      socket.emit("syncCollars", shockers)
+      // Skip syncing collars in testing mode - server provides dummy collars
+      if (!getTestingMode()) {
+        const shockers = await get_shockers()
+        socket.emit("syncCollars", shockers)
+      }
     }
     sync()
   }, []);
@@ -55,6 +69,18 @@ function App() {
 
   return (
     <div style={{ width: "1 vw" }}>
+      {isTesting && (
+        <div style={{
+          backgroundColor: "#red",
+          border: "2px solid #red",
+          padding: "10px",
+          margin: "10px",
+          borderRadius: "5px",
+          textAlign: "center"
+        }}>
+          🧪 <strong>TESTING MODE ENABLED</strong> - All collar actions are logged to console, no real shocks are sent
+        </div>
+      )}
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6 space-y-10">
         {/* --- Slider 1 --- */}
         <div className="bg-white shadow-lg rounded-2xl p-8 text-center w-[75vw] max-w-2xl">
@@ -122,11 +148,12 @@ function App() {
           ))}
         </ul>
       </div>
-      <button className='half-screen-btn' onClick={handle_btn_All}>All</button>
-      <button className='half-screen-btn' onClick={handle_btn_Random}>Random</button>
-      <button className='half-screen-btn' onClick={handle_btn_Wheel}>Wheel of pain</button>
-      <button className='half-screen-btn' onClick={handle_btn_Stop_All}>STOP</button>      
-
+        <div style={{display: "grid", gridTemplateColumns: "1fr 1fr"}}>
+            <button className='half-screen-btn' onClick={handle_btn_All}>All</button>
+            <button className='half-screen-btn' onClick={handle_btn_Random}>Random</button>
+            <button className='half-screen-btn' onClick={handle_btn_Wheel}>Wheel of pain</button>
+            <button className='half-screen-btn' onClick={handle_btn_Stop_All}>STOP</button>
+        </div>
     </div>
 
   )
