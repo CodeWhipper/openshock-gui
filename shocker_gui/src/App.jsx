@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { get_shockers, control_collar, get_hub_id } from './Api_calls/Api_calls.jsx'
-import { shock_all, shock_person, shock_random, shock_spinning_wheel, vibrate_person, sound_person} from "./shock_modes.jsx"
 import { shock_all, stop_all, shock_person, shock_random, vibrate_person, sound_person, shock_spinning_wheel} from "./shock_modes.jsx"
 import { socket } from "./socket";
 import { setTestingMode, getTestingMode } from "./utils/testing_mode.js";
