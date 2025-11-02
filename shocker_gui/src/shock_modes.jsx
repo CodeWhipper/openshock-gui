@@ -66,4 +66,4 @@ function get_unmuted(collar_list) {
 }
 //function shock_random(collars ,intensity = 10, duration = 300)
 
-export { shock_all, shock_person, shock_random, shock_spinning_wheel, stop_all }
+export { shock_all, shock_person, shock_random, shock_spinning_wheel, stop_all, vibrate_person, sound_person }
