@@ -21,6 +21,16 @@ function App() {
     socket.on("testingMode", (testing) => {
       setTestingMode(testing);
       setIsTesting(testing);
+      
+      // Sync collars after we know the testing mode state
+      // Skip syncing collars in testing mode - server provides dummy collars
+      if (!testing) {
+        const sync = async () => {
+          const shockers = await get_shockers()
+          socket.emit("syncCollars", shockers)
+        }
+        sync()
+      }
     });
 
     return () => {
@@ -32,17 +42,6 @@ function App() {
   const toggleMute = (id, mute) => {
     socket.emit("updateCollar", { id, data: { mute: !mute } });
   };
-
-  useEffect(() => {
-    const sync = async () => {
-      // Skip syncing collars in testing mode - server provides dummy collars
-      if (!getTestingMode()) {
-        const shockers = await get_shockers()
-        socket.emit("syncCollars", shockers)
-      }
-    }
-    sync()
-  }, []);
 
 
   const setShock = (id) => {
@@ -71,8 +70,8 @@ function App() {
     <div style={{ width: "1 vw" }}>
       {isTesting && (
         <div style={{
-          backgroundColor: "#red",
-          border: "2px solid #red",
+          backgroundColor: "#ffcccc",
+          border: "2px solid #ff0000",
           padding: "10px",
           margin: "10px",
           borderRadius: "5px",
