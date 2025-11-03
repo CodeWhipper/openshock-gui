@@ -1,0 +1,18 @@
+.btn-shock {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .btn-shock.stop {
+    background-color: #ef4444;
+  }
+  
+  .btn-shock:hover {
+    opacity: 0.9;
+  }
+  
