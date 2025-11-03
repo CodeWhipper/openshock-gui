@@ -4,6 +4,7 @@ import { get_shockers, control_collar, get_hub_id } from './Api_calls/Api_calls.
 import { shock_all, stop_all, shock_person, shock_random, vibrate_person, sound_person, shock_spinning_wheel} from "./shock_modes.jsx"
 import { socket } from "./socket";
 import { setTestingMode, getTestingMode } from "./utils/testing_mode.js";
+import GameContainer from "./games/GameContainer.jsx";
 
 
 function App() {
@@ -153,6 +154,7 @@ function App() {
             <button className='half-screen-btn' onClick={handle_btn_Wheel}>Wheel of pain</button>
             <button className='half-screen-btn' onClick={handle_btn_Stop_All}>STOP</button>
         </div>
+        <GameContainer collars={collars} />
     </div>
 
   )
