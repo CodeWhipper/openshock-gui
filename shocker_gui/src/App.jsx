@@ -5,12 +5,11 @@ import { shock_all, stop_all, shock_person, shock_random, vibrate_person, sound_
 import { socket } from "./socket";
 
 
-function InteractiveGauge() {
-  const [value, setValue] = useState(50); // Wert: 0–100
+function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSeconds = false }) {
   const svgRef = useRef(null);
 
-    // Hilfsfunktion: Wert begrenzen
-  const clampValue = (v) => Math.max(0, Math.min(100, v));
+  // Wert begrenzen
+  const clampValue = (v) => Math.max(0, Math.min(max, v));
 
   // Klick oder Drag auf das Tacho
   const handlePointer = (e) => {
@@ -25,24 +24,16 @@ function InteractiveGauge() {
     const dx = x - cx;
     const dy = cy - y;
 
-    // Winkel in Grad berechnen (-90° links bis +90° rechts)
-    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-
-    // Begrenzen auf oberen Halbkreis (0° rechts bis 180° links)
+    let angle = Math.atan2(dy, dx) * (180 / Math.PI);
     if (angle < 0) angle = 0;
     if (angle > 180) angle = 180;
 
-    // In Prozentwert (0–100) umrechnen
-   // const newValue = 100-(angle / 180)* 100;
-   // setValue(newValue);
-
-  // 0 % = links, 50 % = oben, 100 % = rechts
-    const newValue = clampValue(100 - (angle / 180) * 100);
+    // links = min, rechts = max
+    const newValue = clampValue(min + ((180 - angle) / 180) * (max - min));
     setValue(newValue);
-
   };
 
-  const angle = 180- (value / 100) * 180  ; // 0–100 => -90° bis +90°
+   const angle = 180 - ((value - min) / (max - min)) * 180; // min bis max => -90° bis +90°
 
   // Nadellänge
   const radius = 100;
@@ -107,9 +98,10 @@ function InteractiveGauge() {
       <div className="mt-4 flex justify-center"></div>
       <input
         type="number"
-        min={0}
-        max={100}
-        value={Math.round(value)}
+         min={displayInSeconds ? min / 1000 : min}
+          max={displayInSeconds ? max / 1000 : max}
+          step={displayInSeconds ? 0.1 : 1}
+          value={displayInSeconds ? (value / 1000).toFixed(1) : Math.round(value)}
         onChange={(e) => setValue(clampValue(Number(e.target.value)))}
         className="w-20 text-center font-bold text-blue-600 border-b-2 border-blue-300 outline-none"
       />
@@ -121,7 +113,7 @@ function InteractiveGauge() {
 
 function App() {
   const [collars, setCollars] = useState([]);
-  const [percentage, setpercentage] = useState(50);
+  const [percentage, setpercentage] = useState(1);
   const [duration, setduration] = useState(300);
 
   useEffect(() => {
@@ -168,84 +160,30 @@ function App() {
   }
 
   return (
-    <div style={{ width: "1 vw" }}>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6 space-y-10">
-        {/* --- Slider 1 --- */}
-        <div className="bg-white shadow-lg rounded-2xl p-8 text-center w-[75vw] max-w-2xl">
-          <h2 className="text-xl font-semibold mb-4">Stärke auswählen</h2>
-          <input
-            type="range"
-            min="1"
-            max="100"
-            value={percentage}
-            onChange={(e) => setpercentage(e.target.value)}
-            className="w-full accent-blue-500 cursor-pointer"
-          />
-          <p className="mt-4 text-lg">
-            Aktueller Wert:{" "}
-            <input
-              type="number"
-              min="1"
-              max="100"
+
+    <div style={{ display:'flex' }}>
+
+      <div>
+          {/* --- Tacho 1 --- */}
+            <h2 className="text-xl font-semibold mb-4">Stärke</h2>
+            <InteractiveGauge
+              min={0}
+              max={100}
               value={percentage}
-              onChange={(e) => setpercentage(e.target.value)}
-              className="font-bold text-blue-600 text-center w-16 border-b-2 border-blue-300 outline-none"
+              setValue={setpercentage}
             />
-          </p>
-        </div>
-
-        <div className="bg-white shadow-lg rounded-2xl p-8 text-center w-[75vw] max-w-2xl">
-          <h2 className="text-xl font-semibold mb-4">Stärke auswählen</h2>
-          <InteractiveGauge />
-        </div>
-        
-        {/* --- Slider 2 --- */}
-        <div className="bg-white shadow-lg rounded-2xl p-8 text-center w-[75vw] max-w-2xl">
-          <h2 className="text-xl font-semibold mb-4">Duration</h2>
-          <input
-            type="range"
-            min="300"
-            max="30000"
-            value={duration}
-            onChange={(e) => setduration(e.target.value)}
-            className="w-full accent-blue-500 cursor-pointer"
-          />
-          <p className="mt-4 text-lg">
-            Aktuelle Duration:{" "}
-            <input
-              type="number"
-              min="300"
-              max="30000"
-              value={duration / 1000}
-              onChange={(e) => setduration(e.target.value * 1000)}
-              className="font-bold text-blue-600 text-center w-20 border-b-2 border-blue-300 outline-none"
-            />{" "}
-            s
-          </p>
-        </div>
       </div>
-      <div >
-        <h1>Collar Manager</h1>
-        <ul>
-          {collars.map((c) => (
-            <li style={{ padding: "5px" }} key={c.id}>
-              <b style={{ marginRight: "10px" }}>{c.name} — Shock max: {c.max_shock} — Mute: {c.mute ? "🔇" : "🔊"} </b>
-              <button style={{ marginRight: "10px" }} onClick={() => toggleMute(c.id, c.mute)}>
-                {c.mute ? "Unmute" : "Mute"}
-              </button>
-              <button style={{ marginRight: "10px", marginTop:"10px" }} onClick={() => setShock(c.id)}>Set Shock Maximum </button>
-              <button style={{ marginRight: "10px", marginTop:"10px" }} onClick={() => shock_person(c, percentage, duration)}>Shock {c.name}</button >
-              <button style={{ marginRight: "10px", marginTop:"10px" }} onClick={() => vibrate_person(c, percentage, duration)}>Vibrate {c.name}</button >
-              <button style={{ marginRight: "10px", marginTop:"10px" }} onClick={() => sound_person(c, percentage, duration)}>Sound {c.name}</button >
-            </li>
-          ))}
-        </ul>
+      <div>
+          {/* --- Tacho 2 --- */}
+            <h2 className="text-xl font-semibold mb-4">Dauer</h2>
+            <InteractiveGauge
+              min={300}
+              max={30000}
+              value={duration}
+              setValue={setduration}
+              displayInSeconds={true} // nur für Duration
+            />
       </div>
-      <button className='half-screen-btn' onClick={handle_btn_All}>All</button>
-      <button className='half-screen-btn' onClick={handle_btn_Random}>Random</button>
-      <button className='half-screen-btn' onClick={handle_btn_Wheel}>Wheel of pain</button>
-      <button className='half-screen-btn' onClick={handle_btn_Stop_All}>STOP</button>      
-
     </div>
 
   )
