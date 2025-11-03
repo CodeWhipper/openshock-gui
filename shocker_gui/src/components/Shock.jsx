@@ -1,15 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { socket } from "../socket"; // adjust path if needed
+import { socket } from "../socket";
 import {
   shock_all,
   stop_all,
   shock_random,
   shock_spinning_wheel,
-} from "../shock_modes"; // adjust path
-import { get_shockers } from "../Api_calls/Api_calls"; // adjust path
-import "./Shock.css"; // optional styling
+} from "../shock_modes";
+import { get_shockers } from "../Api_calls/Api_calls";
+import "./Shock.css";
 
-// Interactive Gauge Component
 function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSeconds = false }) {
   const svgRef = useRef(null);
 
@@ -45,7 +44,7 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
   const needleY = 120 - needleLength * Math.sin((angle * Math.PI) / 180);
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="gauge-container">
       <svg
         ref={svgRef}
         width="240"
@@ -82,6 +81,7 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
         />
         <circle cx="120" cy="120" r="6" fill="#fff" />
       </svg>
+
       <input
         type="number"
         min={displayInSeconds ? min / 1000 : min}
@@ -89,13 +89,12 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
         step={displayInSeconds ? 0.1 : 1}
         value={displayInSeconds ? (value / 1000).toFixed(1) : Math.round(value)}
         onChange={(e) => setValue(clampValue(Number(e.target.value)))}
-        className="w-20 text-center font-bold text-blue-600 border-b-2 border-blue-300 outline-none mt-2"
+        className="gauge-input"
       />
     </div>
   );
 }
 
-// Shock Page Component
 export default function Shock() {
   const [collars, setCollars] = useState([]);
   const [percentage, setPercentage] = useState(1);
@@ -120,20 +119,24 @@ export default function Shock() {
   const handleWheel = () => shock_spinning_wheel(collars, percentage, duration);
 
   return (
-    <div style={{ display: "flex", gap: "40px", flexWrap: "wrap" }}>
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Stärke</h2>
-        <InteractiveGauge min={0} max={100} value={percentage} setValue={setPercentage} />
+    <div className="shock-page">
+      <div className="gauges-row">
+        <div className="gauge-section">
+          <h2 className="gauge-title">Stärke</h2>
+          <InteractiveGauge min={0} max={100} value={percentage} setValue={setPercentage} />
+        </div>
+
+        <div className="gauge-section">
+          <h2 className="gauge-title">Dauer</h2>
+          <InteractiveGauge min={300} max={30000} value={duration} setValue={setDuration} displayInSeconds />
+        </div>
       </div>
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Dauer</h2>
-        <InteractiveGauge
-          min={300}
-          max={30000}
-          value={duration}
-          setValue={setDuration}
-          displayInSeconds={true}
-        />
+
+      <div className="shock-buttons">
+        <button onClick={handleAll} className="btn-shock">Shock All</button>
+        <button onClick={handleStopAll} className="btn-shock stop">Stop All</button>
+        <button onClick={handleRandom} className="btn-shock">Shock Random</button>
+        <button onClick={handleWheel} className="btn-shock">Shock Wheel</button>
       </div>
     </div>
   );
