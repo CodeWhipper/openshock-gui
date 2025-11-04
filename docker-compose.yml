@@ -1,9 +1,16 @@
 version: "3.8"
 
+version: "3.8"
+
 services:
   backend:
     build: ./shocker_server
     container_name: node-backend
+    expose:
+      - "4000"            # nur intern (kein ports:)
+    restart: unless-stopped
+    networks:
+      - appnet
     expose:
       - "4000"            # nur intern (kein ports:)
     restart: unless-stopped
@@ -17,9 +24,16 @@ services:
         VITE_OPEN_SHOCK_API_KEY: ${VITE_OPEN_SHOCK_API_KEY}
     container_name: react-frontend
     ports:
-      - "80:80"         # nur Frontend nach außen
+      - "5173:80"         # nur Frontend nach außen
     depends_on:
       - backend
+    restart: unless-stopped
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    driver: bridge
     restart: unless-stopped
     networks:
       - appnet
