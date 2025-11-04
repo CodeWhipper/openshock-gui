@@ -1,0 +1,16 @@
+services:
+  backend:
+    build: ./shocker_server
+    container_name: node-backend
+    ports:
+      - "4000:4000"
+    restart: always
+
+  frontend:
+    build:
+      context: ./shocker_gui
+    container_name: react-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
