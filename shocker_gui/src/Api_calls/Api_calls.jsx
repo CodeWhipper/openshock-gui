@@ -3,7 +3,7 @@ import { socket } from "../socket";
 
 const openShockApiKey = import.meta.env.VITE_OPEN_SHOCK_API_KEY
 
-function make_api_call(Url, Body) {
+function make_api_call(Url, Body) {   
     const options = {
         headers: {
             'OpenShockToken': openShockApiKey,

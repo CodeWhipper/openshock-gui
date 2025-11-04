@@ -1,0 +1,20 @@
+# --- Backend Dockerfile ---
+FROM node:18-alpine
+
+# Arbeitsverzeichnis
+WORKDIR /app
+
+# package.json + package-lock.json kopieren
+COPY package*.json ./
+
+# Dependencies installieren
+RUN npm install --production
+
+# Restlichen Code kopieren
+COPY . .
+
+# Port freigeben
+EXPOSE 4000
+
+# Startbefehl
+CMD ["node", "server.js"]
