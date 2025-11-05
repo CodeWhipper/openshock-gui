@@ -7,6 +7,9 @@ RUN npm install
 
 COPY . .
 
+ARG VITE_OPEN_SHOCK_API_KEY
+ENV VITE_OPEN_SHOCK_API_KEY=$VITE_OPEN_SHOCK_API_KEY
+
 RUN npm run build
 
 # 2. Serve-Phase
@@ -15,6 +18,7 @@ FROM nginx:alpine
 # Build aus erster Phase kopieren
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-EXPOSE 5173
+# Eigene Nginx-Konfiguration kopieren
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 CMD ["nginx", "-g", "daemon off;"]

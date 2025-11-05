@@ -53,7 +53,6 @@ io.on("connection", (socket) => {
       // Don't sync in testing mode, keep dummy collars
     } else {
       collars.forEach(c => manager.upsertCollar(c));
-      console.log(manager.get_all_collars());
     }
     
     io.emit("update", manager.get_all_collars());
