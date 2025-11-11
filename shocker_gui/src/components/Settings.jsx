@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Settings.css";
 
@@ -6,11 +6,40 @@ export default function Settings({ names, updateName, addName }) {
   const navigate = useNavigate();
   const [newName, setNewName] = useState("");
 
+  // Lokaler State für Inputs
+  const [localValues, setLocalValues] = useState({});
+
+  // Immer wenn names sich ändern, localValues synchronisieren (aber nur falls noch nicht existiert)
+  useEffect(() => {
+    const newLocal = {};
+    names.forEach((n) => {
+      if (!localValues[n.id]) {
+        newLocal[n.id] = { localMaxShock: n.max_shock };
+      } else {
+        newLocal[n.id] = { ...localValues[n.id] };
+      }
+    });
+    setLocalValues(newLocal);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [names]);
+
+  const updateLocalMaxShock = (id, value) => {
+    setLocalValues((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], localMaxShock: value }
+    }));
+  };
+
+  const handleBlurMaxShock = (id) => {
+    const val = Number(localValues[id]?.localMaxShock ?? 0);
+    const clamped = Math.max(0, Math.min(100, val));
+    updateName(id, "max_shock", clamped);
+  };
+
   return (
     <div>
       <h1>Settings Page</h1>
 
-      {/* Go Back to Shock button at the top */}
       <button
         onClick={() => navigate("/")}
         style={{
@@ -59,7 +88,7 @@ export default function Settings({ names, updateName, addName }) {
                   type="number"
                   min="0"
                   max="100"
-                  value={n.max_shock}
+                  value={Number(n.max_shock)}
                   onChange={(e) =>
                     updateName(
                       n.id,
@@ -118,7 +147,6 @@ export default function Settings({ names, updateName, addName }) {
         </tbody>
       </table>
 
-      {/* Add new name section remains at bottom */}
       <div style={{ marginTop: "20px" }}>
         <input
           type="text"

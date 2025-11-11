@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { socket } from "../socket";
+import { useState, useRef } from "react";
+import { useNames } from "../utils/NamesContext";
 import {
   shock_all,
   stop_all,
@@ -7,17 +7,14 @@ import {
   shock_spinning_wheel,
   shock_person,
   vibrate_person,
-  sound_person,
+  sound_person
 } from "../shock_modes";
-import { get_shockers } from "../Api_calls/Api_calls";
 import "./Shock.css";
-
-import { FaBolt, FaVolumeUp,} from "react-icons/fa";
+import { FaBolt, FaVolumeUp } from "react-icons/fa";
 import { LuVibrate } from "react-icons/lu";
 
-function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSeconds = false }) {
+function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSeconds = false, integerOnly = false }) {
   const svgRef = useRef(null);
-
   const clampValue = (v) => Math.max(min, Math.min(max, v));
 
   const handlePointer = (e) => {
@@ -39,8 +36,15 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
     if (angle < 0) angle = 0;
     if (angle > 180) angle = 180;
 
-    const newValue = clampValue(min + ((180 - angle) / 180) * (max - min));
-    setValue(newValue);
+    let newValue = min + ((180 - angle) / 180) * (max - min);
+
+    // Stärke: ganze Zahlen
+    if (integerOnly) newValue = Math.round(newValue);
+
+    // Dauer: auf ganze Zahl speichern, Anzeige bleibt in Sekunden
+    if (displayInSeconds) newValue = Math.round(newValue);
+
+    setValue(clampValue(newValue));
   };
 
   const angle = 180 - ((value - min) / (max - min)) * 180;
@@ -94,7 +98,11 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
         max={displayInSeconds ? max / 1000 : max}
         step={displayInSeconds ? 0.1 : 1}
         value={displayInSeconds ? (value / 1000).toFixed(1) : Math.round(value)}
-        onChange={(e) => setValue(clampValue(Number(e.target.value)))}
+        onChange={(e) => {
+          let val = clampValue(Number(e.target.value) * (displayInSeconds ? 1000 : 1));
+          if (integerOnly || displayInSeconds) val = Math.round(val);
+          setValue(val);
+        }}
         className="gauge-input"
       />
     </div>
@@ -102,73 +110,48 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
 }
 
 export default function Shock() {
-  const [collars, setCollars] = useState([]);
+  const { names } = useNames();
   const [percentage, setPercentage] = useState(1);
   const [duration, setDuration] = useState(300);
 
-  useEffect(() => {
-    socket.on("update", (data) => setCollars(data));
-    return () => socket.off("update");
-  }, []);
+  const activeNames = names.filter((n) => n.active);
 
-  useEffect(() => {
-    const sync = async () => {
-      const shockers = await get_shockers();
-      socket.emit("syncCollars", shockers);
-    };
-    sync();
-  }, []);
+  const handleShock = () => activeNames.forEach((n) => shock_person(n, percentage, duration));
+  const handleVibration = () => activeNames.forEach((n) => vibrate_person(n, percentage, duration));
+  const handleSound = () => activeNames.forEach((n) => sound_person(n, percentage, duration));
 
-  const handleRandom = () => shock_random(collars, percentage, duration);
-  const handleAll = () => shock_all(collars, percentage, duration);
-  const handleStopAll = () => stop_all(collars);
-  const handleWheel = () => shock_spinning_wheel(collars, percentage, duration);
-
-  const handleShock = () => shock_person(collars, percentage, duration);
-  const handleVibration = () => vibrate_person(collars, percentage, duration);
-  const handleSound = () => sound_person(collars, percentage, duration);
-
+  const handleAll = () => shock_all(activeNames, percentage, duration);
+  const handleRandom = () => shock_random(activeNames, percentage, duration);
+  const handleWheel = () => shock_spinning_wheel(activeNames, percentage, duration);
+  const handleStopAll = () => stop_all(activeNames);
 
   return (
     <div className="shock-page">
       <div className="gauges-row">
         <div className="gauge-section">
           <h2 className="gauge-title">Stärke</h2>
-          <InteractiveGauge 
-            min={0} 
-            max={100} 
-            value={percentage} 
-            setValue={setPercentage} 
-          />
+          <InteractiveGauge min={0} max={100} value={percentage} setValue={setPercentage} integerOnly={true} />
         </div>
-
         <div className="gauge-section">
           <h2 className="gauge-title">Dauer</h2>
-          <InteractiveGauge 
-            min={300} 
-            max={30000} 
-            value={duration} 
-            setValue={setDuration} 
-            displayInSeconds 
-          />
+          <InteractiveGauge min={300} max={30000} value={duration} setValue={setDuration} displayInSeconds />
         </div>
       </div>
-      
-      <div className="shock-buttons">
-        <button onClick={handleShock} className="btn-action"><FaBolt /></button>
-        <button onClick={handleVibration} className="btn-action"><LuVibrate /></button>
-        <button onClick={handleSound} className="btn-action"><FaVolumeUp /></button>
-      </div>
 
+      <div className="shock-buttons">
+        <button onClick={handleShock}><FaBolt /></button>
+        <button onClick={handleVibration}><LuVibrate /></button>
+        <button onClick={handleSound}><FaVolumeUp /></button>
+      </div>
 
       <div>
         <button onClick={handleStopAll} className="btn-shock stop">Stop All</button>
       </div>
 
       <div className="shock-buttons">
-        <button onClick={handleAll} className="btn-shock">Shock All</button>
-        <button onClick={handleRandom} className="btn-shock">Shock Random</button>
-        <button onClick={handleWheel} className="btn-shock">Wheel of Pain</button>
+        <button onClick={handleAll}>Shock All</button>
+        <button onClick={handleRandom}>Shock Random</button>
+        <button onClick={handleWheel}>Wheel of Pain</button>
       </div>
     </div>
   );

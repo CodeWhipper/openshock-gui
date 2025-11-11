@@ -2,9 +2,12 @@ import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
 import Shock from "./components/Shock";
 import Settings from "./components/Settings";
+import { useNames } from "./utils/NamesContext";
 import "./App.css";
 
-function Sidebar({ names, toggleSidebarActive, shockSelection, toggleShockSelection }) {
+function Sidebar({ shockSelection, toggleShockSelection }) {
+  const { names, toggleSidebarActive } = useNames();
+
   return (
     <div className="sidebar">
       <div className="mode-section">
@@ -47,61 +50,7 @@ function Sidebar({ names, toggleSidebarActive, shockSelection, toggleShockSelect
 function AppWrapper() {
   const location = useLocation();
   const [shockSelection, setShockSelection] = useState(false);
-
-  const [names, setNames] = useState([
-    {
-      id: 1,
-      name: "Alice",
-      sidebarActive: false,
-      active: false,
-      max_shock: 50,
-      game_random: false,
-      game_wheel: false,
-      game_tick: false,
-      game_mine: false,
-    },
-    {
-      id: 2,
-      name: "Bob",
-      sidebarActive: true,
-      active: true,
-      max_shock: 70,
-      game_random: true,
-      game_wheel: false,
-      game_tick: true,
-      game_mine: false,
-    },
-  ]);
-
-  const toggleSidebarActive = (id) => {
-    setNames((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, sidebarActive: !n.sidebarActive } : n))
-    );
-  };
-
-  const updateName = (id, key, value) => {
-    setNames((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, [key]: value } : n))
-    );
-  };
-
-  const addName = (newName) => {
-    const nextId = names.length > 0 ? Math.max(...names.map(n => n.id)) + 1 : 1;
-    setNames([
-      ...names,
-      {
-        id: nextId,
-        name: newName,
-        sidebarActive: false,
-        active: false,
-        max_shock: 50,
-        game_random: false,
-        game_wheel: false,
-        game_tick: false,
-        game_mine: false,
-      },
-    ]);
-  };
+  const { names, addName, updateName } = useNames();
 
   const showSidebar = location.pathname === "/";
 
@@ -109,8 +58,6 @@ function AppWrapper() {
     <div className="app-container">
       {showSidebar && (
         <Sidebar
-          names={names}
-          toggleSidebarActive={toggleSidebarActive}
           shockSelection={shockSelection}
           toggleShockSelection={setShockSelection}
         />
@@ -129,10 +76,14 @@ function AppWrapper() {
   );
 }
 
+import { NamesProvider } from "./utils/NamesContext";
+
 export default function App() {
   return (
     <Router>
-      <AppWrapper />
+      <NamesProvider>
+        <AppWrapper />
+      </NamesProvider>
     </Router>
   );
 }
