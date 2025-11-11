@@ -1,11 +1,19 @@
+import { useRef } from "react";
 import { useNames } from "../utils/NamesContext";
-import { shock_all, stop_all, shock_random, shock_spinning_wheel, shock_person, vibrate_person, sound_person } from "../shock_modes";
-import "./Shock.css";
+import {
+  shock_all,
+  stop_all,
+  shock_random,
+  shock_spinning_wheel,
+  shock_person,
+  vibrate_person,
+  sound_person
+} from "../shock_modes";
 import { FaBolt, FaVolumeUp } from "react-icons/fa";
 import { LuVibrate } from "react-icons/lu";
-import { useRef } from "react";
+import "./Shock.css";
 
-// === Interaktive Gauge ===
+// === Interactive Gauge Component ===
 function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSeconds = false, integerOnly = false }) {
   const svgRef = useRef(null);
 
@@ -26,11 +34,9 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
     const dy = cy - y;
 
     let angle = Math.atan2(dy, dx) * (180 / Math.PI);
-    if (angle < 0) angle = 0;
-    if (angle > 180) angle = 180;
+    angle = Math.max(0, Math.min(180, angle));
 
     let newValue = min + ((180 - angle) / 180) * (max - min);
-
     if (integerOnly || displayInSeconds) newValue = Math.round(newValue);
     setValue(clampValue(newValue));
   };
@@ -97,18 +103,13 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
   );
 }
 
-// === Hauptkomponente ===
+// === Shock Component ===
 export default function Shock({ percentage, setPercentage, duration, setDuration }) {
   const { names } = useNames();
-  const activeNames = names.filter(n => n.active);
+  const activeNames = names.filter((n) => n.active);
 
-  const handleShock = () => activeNames.forEach(n => shock_person(n, percentage, duration));
-  const handleVibration = () => activeNames.forEach(n => vibrate_person(n, percentage, duration));
-  const handleSound = () => activeNames.forEach(n => sound_person(n, percentage, duration));
-  const handleAll = () => shock_all(activeNames, percentage, duration);
-  const handleRandom = () => shock_random(activeNames, percentage, duration);
-  const handleWheel = () => shock_spinning_wheel(activeNames, percentage, duration);
-  const handleStopAll = () => stop_all(activeNames);
+  // Helper to run a function on all active users
+  const runOnActive = (fn) => activeNames.forEach((n) => fn(n, percentage, duration));
 
   return (
     <div className="shock-page">
@@ -124,19 +125,19 @@ export default function Shock({ percentage, setPercentage, duration, setDuration
       </div>
 
       <div className="shock-buttons">
-        <button onClick={handleShock}><FaBolt /></button>
-        <button onClick={handleVibration}><LuVibrate /></button>
-        <button onClick={handleSound}><FaVolumeUp /></button>
+        <button onClick={() => runOnActive(shock_person)}><FaBolt /></button>
+        <button onClick={() => runOnActive(vibrate_person)}><LuVibrate /></button>
+        <button onClick={() => runOnActive(sound_person)}><FaVolumeUp /></button>
       </div>
 
       <div>
-        <button onClick={handleStopAll} className="btn-shock stop">Stop All</button>
+        <button onClick={() => stop_all(activeNames)} className="btn-shock stop">Stop All</button>
       </div>
 
       <div className="shock-buttons">
-        <button onClick={handleAll}>Shock All</button>
-        <button onClick={handleRandom}>Shock Random</button>
-        <button onClick={handleWheel}>Wheel of Pain</button>
+        <button onClick={() => shock_all(activeNames, percentage, duration)}>Shock All</button>
+        <button onClick={() => shock_random(activeNames, percentage, duration)}>Shock Random</button>
+        <button onClick={() => shock_spinning_wheel(activeNames, percentage, duration)}>Wheel of Pain</button>
       </div>
     </div>
   );

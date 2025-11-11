@@ -5,22 +5,23 @@ import Settings from "./components/Settings";
 import { NamesProvider, useNames } from "./utils/NamesContext";
 import "./App.css";
 
-// === LocalStorage Helper ===
-function loadFromLocal(key, defaultValue) {
+// === LocalStorage Helpers ===
+const loadFromLocal = (key, defaultValue) => {
   try {
     const stored = localStorage.getItem(key);
-    if (stored !== null) return JSON.parse(stored);
-  } catch {}
-  return defaultValue;
-}
+    return stored !== null ? JSON.parse(stored) : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+};
 
-function saveToLocal(key, value) {
+const saveToLocal = (key, value) => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch {}
-}
+};
 
-// === Sidebar ===
+// === Sidebar Component ===
 function Sidebar({ shockSelection, toggleShockSelection }) {
   const { names, toggleSidebarActive } = useNames();
 
@@ -61,30 +62,30 @@ function Sidebar({ shockSelection, toggleShockSelection }) {
   );
 }
 
-// === AppWrapper ===
+// === App Wrapper ===
 function AppWrapper() {
   const location = useLocation();
   const showSidebar = location.pathname === "/";
 
-  // Local Storage Zustände
+  // LocalStorage states
   const [shockSelection, setShockSelection] = useState(() => loadFromLocal("shockSelection", false));
   const [percentage, setPercentage] = useState(() => loadFromLocal("shockPercentage", 1));
   const [duration, setDuration] = useState(() => loadFromLocal("shockDuration", 300));
 
-  // Update Funktionen speichern Werte auch in LocalStorage
-  const updateShockSelection = (val) => {
-    setShockSelection(val);
-    saveToLocal("shockSelection", val);
+  // Update handlers that sync with LocalStorage
+  const updateShockSelection = (value) => {
+    setShockSelection(value);
+    saveToLocal("shockSelection", value);
   };
 
-  const updatePercentage = (val) => {
-    setPercentage(val);
-    saveToLocal("shockPercentage", val);
+  const updatePercentage = (value) => {
+    setPercentage(value);
+    saveToLocal("shockPercentage", value);
   };
 
-  const updateDuration = (val) => {
-    setDuration(val);
-    saveToLocal("shockDuration", val);
+  const updateDuration = (value) => {
+    setDuration(value);
+    saveToLocal("shockDuration", value);
   };
 
   return (
@@ -113,7 +114,7 @@ function AppWrapper() {
   );
 }
 
-// === Haupt-App ===
+// === Main App ===
 export default function App() {
   return (
     <Router>

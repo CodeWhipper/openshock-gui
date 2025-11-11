@@ -1,23 +1,25 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { socket } from "../socket"; 
 
+// Create context for names
 const NamesContext = createContext();
 
 export function NamesProvider({ children }) {
   const [names, setNames] = useState([]);
   const [initialized, setInitialized] = useState(false);
 
+  // Listen for server updates
   useEffect(() => {
-    // Auf Serverdaten warten
-    socket.on("update", (serverNames) => {
+    const handleUpdate = (serverNames) => {
       setNames(serverNames);
       setInitialized(true);
-    });
+    };
 
-    return () => socket.off("update");
+    socket.on("update", handleUpdate);
+    return () => socket.off("update", handleUpdate);
   }, []);
 
-  // Initiale API nur falls Server noch keine Daten hat
+  // Fetch initial names from API if server has none
   useEffect(() => {
     if (!initialized) {
       import("../Api_calls/Api_calls").then(({ get_shockers }) => {
@@ -28,17 +30,21 @@ export function NamesProvider({ children }) {
     }
   }, [initialized]);
 
+  // Update a name's property
   const updateName = (id, key, value) => {
-    setNames(prev => {
-      const updated = prev.map(n => n.id === id ? { ...n, [key]: value } : n);
+    setNames(prevNames => {
+      const updatedNames = prevNames.map(n => 
+        n.id === id ? { ...n, [key]: value } : n
+      );
       socket.emit("updateCollar", { id, data: { [key]: value } });
-      return updated;
+      return updatedNames;
     });
   };
 
+  // Add a new name
   const addName = (newName) => {
-    setNames(prev => {
-      const nextId = prev.length > 0 ? Math.max(...prev.map(n => n.id)) + 1 : 1;
+    setNames(prevNames => {
+      const nextId = prevNames.length ? Math.max(...prevNames.map(n => n.id)) + 1 : 1;
       const newCollar = {
         id: nextId,
         name: newName,
@@ -50,7 +56,7 @@ export function NamesProvider({ children }) {
         game_mine: false,
       };
       socket.emit("addCollar", newCollar);
-      return [...prev, newCollar];
+      return [...prevNames, newCollar];
     });
   };
 
@@ -61,6 +67,7 @@ export function NamesProvider({ children }) {
   );
 }
 
+// Custom hook to access names context
 export function useNames() {
   return useContext(NamesContext);
 }

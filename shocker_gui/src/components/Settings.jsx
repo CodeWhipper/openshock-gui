@@ -8,13 +8,21 @@ export default function Settings() {
   const { names, updateName, addName } = useNames();
   const [newName, setNewName] = useState("");
 
+  // Helper for rendering checkbox toggles
+  const renderSwitch = (checked, onChange) => (
+    <label className="switch">
+      <input type="checkbox" checked={checked} onChange={onChange} />
+      <span className="slider"></span>
+    </label>
+  );
+
   return (
-    <div>
+    <div className="settings-page">
       <h1>Settings Page</h1>
 
       <button
+        className="back-button"
         onClick={() => navigate("/")}
-        style={{ padding: "10px 20px", backgroundColor: "#4caf50", color: "white", border: "none", borderRadius: "5px", cursor: "pointer", marginBottom: "20px" }}
       >
         Go Back to Shock
       </button>
@@ -32,63 +40,49 @@ export default function Settings() {
           </tr>
         </thead>
         <tbody>
-          {names.map(n => (
+          {names.map((n) => (
             <tr key={n.id}>
               <td>{n.name}</td>
-              <td>
-                <label className="switch">
-                  <input type="checkbox" checked={n.active} onChange={() => updateName(n.id, "active", !n.active)} />
-                  <span className="slider"></span>
-                </label>
-              </td>
+              <td>{renderSwitch(n.active, () => updateName(n.id, "active", !n.active))}</td>
               <td>
                 <input
                   type="number"
                   min="0"
                   max="100"
                   value={n.max_shock}
-                  onChange={e => updateName(n.id, "max_shock", Math.max(0, Math.min(100, Number(e.target.value))))}
+                  onChange={(e) =>
+                    updateName(
+                      n.id,
+                      "max_shock",
+                      Math.max(0, Math.min(100, Number(e.target.value)))
+                    )
+                  }
                 />
               </td>
-              <td>
-                <label className="switch">
-                  <input type="checkbox" checked={n.game_random} onChange={() => updateName(n.id, "game_random", !n.game_random)} />
-                  <span className="slider"></span>
-                </label>
-              </td>
-              <td>
-                <label className="switch">
-                  <input type="checkbox" checked={n.game_wheel} onChange={() => updateName(n.id, "game_wheel", !n.game_wheel)} />
-                  <span className="slider"></span>
-                </label>
-              </td>
-              <td>
-                <label className="switch">
-                  <input type="checkbox" checked={n.game_tick} onChange={() => updateName(n.id, "game_tick", !n.game_tick)} />
-                  <span className="slider"></span>
-                </label>
-              </td>
-              <td>
-                <label className="switch">
-                  <input type="checkbox" checked={n.game_mine} onChange={() => updateName(n.id, "game_mine", !n.game_mine)} />
-                  <span className="slider"></span>
-                </label>
-              </td>
+              <td>{renderSwitch(n.game_random, () => updateName(n.id, "game_random", !n.game_random))}</td>
+              <td>{renderSwitch(n.game_wheel, () => updateName(n.id, "game_wheel", !n.game_wheel))}</td>
+              <td>{renderSwitch(n.game_tick, () => updateName(n.id, "game_tick", !n.game_tick))}</td>
+              <td>{renderSwitch(n.game_mine, () => updateName(n.id, "game_mine", !n.game_mine))}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      <div style={{ marginTop: "20px" }}>
-        <input type="text" placeholder="New name" value={newName} onChange={(e) => setNewName(e.target.value)} style={{ padding: "5px" }} />
+      <div className="add-name-section">
+        <input
+          type="text"
+          placeholder="New name"
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+        />
         <button
           onClick={() => {
-            if (newName.trim() !== "") {
-              addName(newName.trim());
+            const trimmed = newName.trim();
+            if (trimmed) {
+              addName(trimmed);
               setNewName("");
             }
           }}
-          style={{ padding: "5px 10px", marginLeft: "10px", backgroundColor: "#4caf50", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}
         >
           Add Name
         </button>
