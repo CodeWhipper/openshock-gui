@@ -2,6 +2,8 @@ import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
 import Shock from "./components/Shock";
 import Settings from "./components/Settings";
+import Mindsweeper from "./components/Mindsweeper";
+import TicTacToe from "./components/TicTacToe";
 import { NamesProvider, useNames } from "./utils/NamesContext";
 import "./App.css";
 
@@ -65,7 +67,8 @@ function Sidebar({ shockSelection, toggleShockSelection }) {
 // === App Wrapper ===
 function AppWrapper() {
   const location = useLocation();
-  const showSidebar = location.pathname === "/";
+  // Sidebar only shows on "/" and "/settings"
+  const showSidebar = location.pathname === "/" || location.pathname === "/settings";
 
   // LocalStorage states
   const [shockSelection, setShockSelection] = useState(() => loadFromLocal("shockSelection", false));
@@ -108,6 +111,8 @@ function AppWrapper() {
             }
           />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/mindsweeper" element={<Mindsweeper />} />
+          <Route path="/tictactoe" element={<TicTacToe />} />
         </Routes>
       </div>
     </div>

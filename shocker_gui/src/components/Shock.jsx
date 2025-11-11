@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { useNames } from "../utils/NamesContext";
+import { useNavigate } from "react-router-dom";
 import {
   shock_all,
   stop_all,
@@ -7,7 +8,7 @@ import {
   shock_spinning_wheel,
   shock_person,
   vibrate_person,
-  sound_person
+  sound_person,
 } from "../shock_modes";
 import { FaBolt, FaVolumeUp } from "react-icons/fa";
 import { LuVibrate } from "react-icons/lu";
@@ -106,9 +107,9 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
 // === Shock Component ===
 export default function Shock({ percentage, setPercentage, duration, setDuration }) {
   const { names } = useNames();
+  const navigate = useNavigate();
   const activeNames = names.filter((n) => n.active);
 
-  // Helper to run a function on all active users
   const runOnActive = (fn) => activeNames.forEach((n) => fn(n, percentage, duration));
 
   return (
@@ -138,6 +139,25 @@ export default function Shock({ percentage, setPercentage, duration, setDuration
         <button onClick={() => shock_all(activeNames, percentage, duration)}>Shock All</button>
         <button onClick={() => shock_random(activeNames, percentage, duration)}>Shock Random</button>
         <button onClick={() => shock_spinning_wheel(activeNames, percentage, duration)}>Wheel of Pain</button>
+      </div>
+
+      {/* New button to navigate to Mindsweeper */}
+      <div style={{ marginTop: "20px" }}>
+        <button
+          onClick={() => navigate("/mindsweeper")}
+          className="btn-shock mindsweeper"
+        >
+          Go to Mindsweeper
+        </button>
+      </div>
+            {/* New button to navigate to TicTacToe */}
+            <div style={{ marginTop: "20px" }}>
+        <button
+          onClick={() => navigate("/tictactoe")}
+          className="btn-shock TicTacToe"
+        >
+          Go to TicTacToe
+        </button>
       </div>
     </div>
   );
