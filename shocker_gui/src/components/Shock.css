@@ -60,8 +60,19 @@
   font-weight: bold;
   cursor: pointer;
 }
+.btn-action {
+  padding: 10px 20px;
+  color: white;
+  border:  none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
 
 .btn-shock.stop {
+  display: block;               
+  width: 50vw;  
+  margin: 0 auto; 
   background-color: #ef4444;
 }
 

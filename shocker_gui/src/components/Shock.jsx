@@ -5,9 +5,15 @@ import {
   stop_all,
   shock_random,
   shock_spinning_wheel,
+  shock_person,
+  vibrate_person,
+  sound_person,
 } from "../shock_modes";
 import { get_shockers } from "../Api_calls/Api_calls";
 import "./Shock.css";
+
+import { FaBolt, FaVolumeUp,} from "react-icons/fa";
+import { LuVibrate } from "react-icons/lu";
 
 function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSeconds = false }) {
   const svgRef = useRef(null);
@@ -118,25 +124,51 @@ export default function Shock() {
   const handleStopAll = () => stop_all(collars);
   const handleWheel = () => shock_spinning_wheel(collars, percentage, duration);
 
+  const handleShock = () => shock_person(collars, percentage, duration);
+  const handleVibration = () => vibrate_person(collars, percentage, duration);
+  const handleSound = () => sound_person(collars, percentage, duration);
+
+
   return (
     <div className="shock-page">
       <div className="gauges-row">
         <div className="gauge-section">
           <h2 className="gauge-title">Stärke</h2>
-          <InteractiveGauge min={0} max={100} value={percentage} setValue={setPercentage} />
+          <InteractiveGauge 
+            min={0} 
+            max={100} 
+            value={percentage} 
+            setValue={setPercentage} 
+          />
         </div>
 
         <div className="gauge-section">
           <h2 className="gauge-title">Dauer</h2>
-          <InteractiveGauge min={300} max={30000} value={duration} setValue={setDuration} displayInSeconds />
+          <InteractiveGauge 
+            min={300} 
+            max={30000} 
+            value={duration} 
+            setValue={setDuration} 
+            displayInSeconds 
+          />
         </div>
+      </div>
+      
+      <div className="shock-buttons">
+        <button onClick={handleShock} className="btn-action"><FaBolt /></button>
+        <button onClick={handleVibration} className="btn-action"><LuVibrate /></button>
+        <button onClick={handleSound} className="btn-action"><FaVolumeUp /></button>
+      </div>
+
+
+      <div>
+        <button onClick={handleStopAll} className="btn-shock stop">Stop All</button>
       </div>
 
       <div className="shock-buttons">
         <button onClick={handleAll} className="btn-shock">Shock All</button>
-        <button onClick={handleStopAll} className="btn-shock stop">Stop All</button>
         <button onClick={handleRandom} className="btn-shock">Shock Random</button>
-        <button onClick={handleWheel} className="btn-shock">Shock Wheel</button>
+        <button onClick={handleWheel} className="btn-shock">Wheel of Pain</button>
       </div>
     </div>
   );
