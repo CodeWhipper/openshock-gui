@@ -11,28 +11,23 @@ const io = new Server(server, {
 
 const manager = new CollarManager();
 
-// Beispiel-Daten:
-
 io.on("connection", (socket) => {
   console.log("Client verbunden");
 
-  // Dem Client den aktuellen Zustand schicken
+  // Aktuellen Zustand senden
   socket.emit("update", manager.get_all_collars());
 
-  // Client ändert etwas → Server aktualisiert
+  // Client ändert etwas → Server aktualisiert und broadcast
   socket.on("updateCollar", ({ id, data }) => {
-    console.log(id);
-    
     manager.update_collar(id, data);
     io.emit("update", manager.get_all_collars());
   });
 
+  // Sync komplett vom Client → Upsert
   socket.on("syncCollars", (collars) => {
-        collars.forEach(c => manager.upsertCollar(c));
-        console.log(manager.get_all_collars());
-        
-        io.emit("update", manager.get_all_collars());
-    });
+    collars.forEach(c => manager.upsertCollar(c));
+    io.emit("update", manager.get_all_collars());
+  });
 
   // Neuen Collar hinzufügen
   socket.on("addCollar", (collarData) => {

@@ -1,20 +1,14 @@
-import { useState, useRef } from "react";
 import { useNames } from "../utils/NamesContext";
-import {
-  shock_all,
-  stop_all,
-  shock_random,
-  shock_spinning_wheel,
-  shock_person,
-  vibrate_person,
-  sound_person
-} from "../shock_modes";
+import { shock_all, stop_all, shock_random, shock_spinning_wheel, shock_person, vibrate_person, sound_person } from "../shock_modes";
 import "./Shock.css";
 import { FaBolt, FaVolumeUp } from "react-icons/fa";
 import { LuVibrate } from "react-icons/lu";
+import { useRef } from "react";
 
+// === Interaktive Gauge ===
 function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSeconds = false, integerOnly = false }) {
   const svgRef = useRef(null);
+
   const clampValue = (v) => Math.max(min, Math.min(max, v));
 
   const handlePointer = (e) => {
@@ -25,7 +19,6 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
 
     const x = clientX - rect.left;
     const y = clientY - rect.top;
-
     const cx = rect.width / 2;
     const cy = rect.height * 0.9;
 
@@ -38,12 +31,7 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
 
     let newValue = min + ((180 - angle) / 180) * (max - min);
 
-    // Stärke: ganze Zahlen
-    if (integerOnly) newValue = Math.round(newValue);
-
-    // Dauer: auf ganze Zahl speichern, Anzeige bleibt in Sekunden
-    if (displayInSeconds) newValue = Math.round(newValue);
-
+    if (integerOnly || displayInSeconds) newValue = Math.round(newValue);
     setValue(clampValue(newValue));
   };
 
@@ -109,17 +97,14 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
   );
 }
 
-export default function Shock() {
+// === Hauptkomponente ===
+export default function Shock({ percentage, setPercentage, duration, setDuration }) {
   const { names } = useNames();
-  const [percentage, setPercentage] = useState(1);
-  const [duration, setDuration] = useState(300);
+  const activeNames = names.filter(n => n.active);
 
-  const activeNames = names.filter((n) => n.active);
-
-  const handleShock = () => activeNames.forEach((n) => shock_person(n, percentage, duration));
-  const handleVibration = () => activeNames.forEach((n) => vibrate_person(n, percentage, duration));
-  const handleSound = () => activeNames.forEach((n) => sound_person(n, percentage, duration));
-
+  const handleShock = () => activeNames.forEach(n => shock_person(n, percentage, duration));
+  const handleVibration = () => activeNames.forEach(n => vibrate_person(n, percentage, duration));
+  const handleSound = () => activeNames.forEach(n => sound_person(n, percentage, duration));
   const handleAll = () => shock_all(activeNames, percentage, duration);
   const handleRandom = () => shock_random(activeNames, percentage, duration);
   const handleWheel = () => shock_spinning_wheel(activeNames, percentage, duration);
@@ -130,7 +115,7 @@ export default function Shock() {
       <div className="gauges-row">
         <div className="gauge-section">
           <h2 className="gauge-title">Stärke</h2>
-          <InteractiveGauge min={0} max={100} value={percentage} setValue={setPercentage} integerOnly={true} />
+          <InteractiveGauge min={0} max={100} value={percentage} setValue={setPercentage} integerOnly />
         </div>
         <div className="gauge-section">
           <h2 className="gauge-title">Dauer</h2>

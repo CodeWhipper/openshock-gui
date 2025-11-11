@@ -2,18 +2,32 @@ import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
 import Shock from "./components/Shock";
 import Settings from "./components/Settings";
-import { useNames } from "./utils/NamesContext";
+import { NamesProvider, useNames } from "./utils/NamesContext";
 import "./App.css";
 
+// === LocalStorage Helper ===
+function loadFromLocal(key, defaultValue) {
+  try {
+    const stored = localStorage.getItem(key);
+    if (stored !== null) return JSON.parse(stored);
+  } catch {}
+  return defaultValue;
+}
+
+function saveToLocal(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {}
+}
+
+// === Sidebar ===
 function Sidebar({ shockSelection, toggleShockSelection }) {
   const { names, toggleSidebarActive } = useNames();
 
   return (
     <div className="sidebar">
       <div className="mode-section">
-        <span className="mode-label">
-          {shockSelection ? "Multimode" : "Singlemode"}
-        </span>
+        <span className="mode-label">{shockSelection ? "Multimode" : "Singlemode"}</span>
         <label className="switch">
           <input
             type="checkbox"
@@ -47,37 +61,59 @@ function Sidebar({ shockSelection, toggleShockSelection }) {
   );
 }
 
+// === AppWrapper ===
 function AppWrapper() {
   const location = useLocation();
-  const [shockSelection, setShockSelection] = useState(false);
-  const { names, addName, updateName } = useNames();
-
   const showSidebar = location.pathname === "/";
+
+  // Local Storage Zustände
+  const [shockSelection, setShockSelection] = useState(() => loadFromLocal("shockSelection", false));
+  const [percentage, setPercentage] = useState(() => loadFromLocal("shockPercentage", 1));
+  const [duration, setDuration] = useState(() => loadFromLocal("shockDuration", 300));
+
+  // Update Funktionen speichern Werte auch in LocalStorage
+  const updateShockSelection = (val) => {
+    setShockSelection(val);
+    saveToLocal("shockSelection", val);
+  };
+
+  const updatePercentage = (val) => {
+    setPercentage(val);
+    saveToLocal("shockPercentage", val);
+  };
+
+  const updateDuration = (val) => {
+    setDuration(val);
+    saveToLocal("shockDuration", val);
+  };
 
   return (
     <div className="app-container">
       {showSidebar && (
-        <Sidebar
-          shockSelection={shockSelection}
-          toggleShockSelection={setShockSelection}
-        />
+        <Sidebar shockSelection={shockSelection} toggleShockSelection={updateShockSelection} />
       )}
 
       <div className="main-content">
         <Routes>
-          <Route path="/" element={<Shock />} />
           <Route
-            path="/settings"
-            element={<Settings names={names} updateName={updateName} addName={addName} />}
+            path="/"
+            element={
+              <Shock
+                percentage={percentage}
+                setPercentage={updatePercentage}
+                duration={duration}
+                setDuration={updateDuration}
+              />
+            }
           />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </div>
     </div>
   );
 }
 
-import { NamesProvider } from "./utils/NamesContext";
-
+// === Haupt-App ===
 export default function App() {
   return (
     <Router>
