@@ -14,47 +14,21 @@ const io = new Server(server, {
 
 const manager = new CollarManager();
 
-// Initialize dummy collars in testing mode
-if (isTestingMode) {
-  console.log("🧪 TESTING MODE ENABLED - Using dummy collars");
-  manager.add_collar({ id: "test-collar-1", name: "Test Collar 1" });
-  manager.add_collar({ id: "test-collar-2", name: "Test Collar 2" });
-  manager.add_collar({ id: "test-collar-3", name: "Test Collar 3" });
-  console.log("✅ Initialized 3 dummy collars");
-}
-
 io.on("connection", (socket) => {
   console.log("Client verbunden");
 
-  // Notify client about testing mode
-  socket.emit("testingMode", isTestingMode);
-
-  // Dem Client den aktuellen Zustand schicken
+  // Aktuellen Zustand senden
   socket.emit("update", manager.get_all_collars());
 
-  // Client ändert etwas → Server aktualisiert
+  // Client ändert etwas → Server aktualisiert und broadcast
   socket.on("updateCollar", ({ id, data }) => {
-    const collar = manager.collarlist.find(c => c.get_id() === id);
-    const collarName = collar ? collar.get_name() : id;
-    
-    if (isTestingMode) {
-      console.log(`🧪 [TEST MODE] Collar "${collarName}" (${id}) updated:`, data);
-    } else {
-      console.log(`Collar "${collarName}" (${id}) updated:`, data);
-    }
-    
     manager.update_collar(id, data);
     io.emit("update", manager.get_all_collars());
   });
 
+  // Sync komplett vom Client → Upsert
   socket.on("syncCollars", (collars) => {
-    if (isTestingMode) {
-      console.log("🧪 [TEST MODE] Sync collars request (ignoring in test mode)");
-      // Don't sync in testing mode, keep dummy collars
-    } else {
-      collars.forEach(c => manager.upsertCollar(c));
-    }
-    
+    collars.forEach(c => manager.upsertCollar(c));
     io.emit("update", manager.get_all_collars());
   });
 

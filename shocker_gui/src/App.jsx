@@ -1,163 +1,131 @@
-import { useState, useEffect } from 'react'
-import './App.css'
-import { get_shockers, control_collar, get_hub_id } from './Api_calls/Api_calls.jsx'
-import { shock_all, stop_all, shock_person, shock_random, vibrate_person, sound_person, shock_spinning_wheel} from "./shock_modes.jsx"
-import { socket } from "./socket";
-import { setTestingMode, getTestingMode } from "./utils/testing_mode.js";
-import GameContainer from "./games/GameContainer.jsx";
+import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
+import Shock from "./components/Shock";
+import Settings from "./components/Settings";
+import Mindsweeper from "./components/Mindsweeper";
+import TicTacToe from "./components/TicTacToe";
+import { NamesProvider, useNames } from "./utils/NamesContext";
+import "./App.css";
 
-
-function App() {
-  const [collars, setCollars] = useState([]);
-  const [percentage, setpercentage] = useState(50);
-  const [duration, setduration] = useState(300);
-  const [isTesting, setIsTesting] = useState(false);
-
-  useEffect(() => {
-    socket.on("update", (data) => {
-      setCollars(data);
-    });
-
-    // Listen for testing mode from server
-    socket.on("testingMode", (testing) => {
-      setTestingMode(testing);
-      setIsTesting(testing);
-      
-      // Sync collars after we know the testing mode state
-      // Skip syncing collars in testing mode - server provides dummy collars
-      if (!testing) {
-        const sync = async () => {
-          const shockers = await get_shockers()
-          socket.emit("syncCollars", shockers)
-        }
-        sync()
-      }
-    });
-
-    return () => {
-      socket.off("update");
-      socket.off("testingMode");
-    };
-  }, []);
-
-  const toggleMute = (id, mute) => {
-    socket.emit("updateCollar", { id, data: { mute: !mute } });
-  };
-
-
-  const setShock = (id) => {
-    const value = parseInt(prompt("Max Shock (0-100):"));
-    socket.emit("updateCollar", { id, data: { max_shock: value } });
-  };
-
-  //todo erstezen von 50 und 30 durch prozente  prozente 1 -100 und duration 300 - 100000
-
-  const handle_btn_Random = () => {
-    shock_random(collars, percentage, duration)
+// === LocalStorage Helpers ===
+const loadFromLocal = (key, defaultValue) => {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored !== null ? JSON.parse(stored) : defaultValue;
+  } catch {
+    return defaultValue;
   }
+};
 
-  const handle_btn_All = () => {
-    shock_all(collars, percentage, duration)
-  }
+const saveToLocal = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {}
+};
 
-  const handle_btn_Stop_All = () => {
-    stop_all(collars)
-  }
-  const handle_btn_Wheel = () => {
-    shock_spinning_wheel(collars, percentage, duration)
-  }
+// === Sidebar Component ===
+function Sidebar({ shockSelection, toggleShockSelection }) {
+  const { names, toggleSidebarActive } = useNames();
 
   return (
-    <div style={{ width: "1 vw" }}>
-      {isTesting && (
-        <div style={{
-          backgroundColor: "#ffcccc",
-          border: "2px solid #ff0000",
-          padding: "10px",
-          margin: "10px",
-          borderRadius: "5px",
-          textAlign: "center"
-        }}>
-          🧪 <strong>TESTING MODE ENABLED</strong> - All collar actions are logged to console, no real shocks are sent
-        </div>
-      )}
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6 space-y-10">
-        {/* --- Slider 1 --- */}
-        <div className="bg-white shadow-lg rounded-2xl p-8 text-center w-[75vw] max-w-2xl">
-          <h2 className="text-xl font-semibold mb-4">Stärke auswählen</h2>
+    <div className="sidebar">
+      <div className="mode-section">
+        <span className="mode-label">{shockSelection ? "Multimode" : "Singlemode"}</span>
+        <label className="switch">
           <input
-            type="range"
-            min="1"
-            max="100"
-            value={percentage}
-            onChange={(e) => setpercentage(e.target.value)}
-            className="w-full accent-blue-500 cursor-pointer"
+            type="checkbox"
+            checked={shockSelection}
+            onChange={() => toggleShockSelection(!shockSelection)}
           />
-          <p className="mt-4 text-lg">
-            Aktueller Wert:{" "}
-            <input
-              type="number"
-              min="1"
-              max="100"
-              value={percentage}
-              onChange={(e) => setpercentage(e.target.value)}
-              className="font-bold text-blue-600 text-center w-16 border-b-2 border-blue-300 outline-none"
-            />
-          </p>
-        </div>
+          <span className="slider"></span>
+        </label>
+      </div>
 
-        {/* --- Slider 2 --- */}
-        <div className="bg-white shadow-lg rounded-2xl p-8 text-center w-[75vw] max-w-2xl">
-          <h2 className="text-xl font-semibold mb-4">Duration</h2>
-          <input
-            type="range"
-            min="300"
-            max="30000"
-            value={duration}
-            onChange={(e) => setduration(e.target.value)}
-            className="w-full accent-blue-500 cursor-pointer"
-          />
-          <p className="mt-4 text-lg">
-            Aktuelle Duration:{" "}
-            <input
-              type="number"
-              min="300"
-              max="30000"
-              value={duration / 1000}
-              onChange={(e) => setduration(e.target.value * 1000)}
-              className="font-bold text-blue-600 text-center w-20 border-b-2 border-blue-300 outline-none"
-            />{" "}
-            s
-          </p>
-        </div>
+      <div className="names-section">
+        {names.map((n) => (
+          <div key={n.id} className="name-item">
+            <span>{n.name}</span>
+            <label className="switch">
+              <input
+                type="checkbox"
+                checked={n.sidebarActive}
+                onChange={() => toggleSidebarActive(n.id)}
+              />
+              <span className="slider"></span>
+            </label>
+          </div>
+        ))}
       </div>
-      <div >
-        <h1>Collar Manager</h1>
-        <ul>
-          {collars.map((c) => (
-            <li style={{ padding: "5px" }} key={c.id}>
-              <b style={{ marginRight: "10px" }}>{c.name} — Shock max: {c.max_shock} — Mute: {c.mute ? "🔇" : "🔊"} </b>
-              <button style={{ marginRight: "10px" }} onClick={() => toggleMute(c.id, c.mute)}>
-                {c.mute ? "Unmute" : "Mute"}
-              </button>
-              <button style={{ marginRight: "10px", marginTop:"10px" }} onClick={() => setShock(c.id)}>Set Shock Maximum </button>
-              <button style={{ marginRight: "10px", marginTop:"10px" }} onClick={() => shock_person(c, percentage, duration)}>Shock {c.name}</button >
-              <button style={{ marginRight: "10px", marginTop:"10px" }} onClick={() => vibrate_person(c, percentage, duration)}>Vibrate {c.name}</button >
-              <button style={{ marginRight: "10px", marginTop:"10px" }} onClick={() => sound_person(c, percentage, duration)}>Sound {c.name}</button >
-            </li>
-          ))}
-        </ul>
-      </div>
-        <div style={{display: "grid", gridTemplateColumns: "1fr 1fr"}}>
-            <button className='half-screen-btn' onClick={handle_btn_All}>All</button>
-            <button className='half-screen-btn' onClick={handle_btn_Random}>Random</button>
-            <button className='half-screen-btn' onClick={handle_btn_Wheel}>Wheel of pain</button>
-            <button className='half-screen-btn' onClick={handle_btn_Stop_All}>STOP</button>
-        </div>
-        <GameContainer collars={collars} />
+
+      <nav className="nav-links">
+        <Link to="/settings">Settings</Link>
+      </nav>
     </div>
-
-  )
+  );
 }
 
-export default App;
+// === App Wrapper ===
+function AppWrapper() {
+  const location = useLocation();
+  // Sidebar only shows on "/" and "/settings"
+  const showSidebar = location.pathname === "/" || location.pathname === "/settings";
+
+  // LocalStorage states
+  const [shockSelection, setShockSelection] = useState(() => loadFromLocal("shockSelection", false));
+  const [percentage, setPercentage] = useState(() => loadFromLocal("shockPercentage", 1));
+  const [duration, setDuration] = useState(() => loadFromLocal("shockDuration", 300));
+
+  // Update handlers that sync with LocalStorage
+  const updateShockSelection = (value) => {
+    setShockSelection(value);
+    saveToLocal("shockSelection", value);
+  };
+
+  const updatePercentage = (value) => {
+    setPercentage(value);
+    saveToLocal("shockPercentage", value);
+  };
+
+  const updateDuration = (value) => {
+    setDuration(value);
+    saveToLocal("shockDuration", value);
+  };
+
+  return (
+    <div className="app-container">
+      {showSidebar && (
+        <Sidebar shockSelection={shockSelection} toggleShockSelection={updateShockSelection} />
+      )}
+
+      <div className="main-content">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Shock
+                percentage={percentage}
+                setPercentage={updatePercentage}
+                duration={duration}
+                setDuration={updateDuration}
+              />
+            }
+          />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/mindsweeper" element={<Mindsweeper />} />
+          <Route path="/tictactoe" element={<TicTacToe />} />
+        </Routes>
+      </div>
+    </div>
+  );
+}
+
+// === Main App ===
+export default function App() {
+  return (
+    <Router>
+      <NamesProvider>
+        <AppWrapper />
+      </NamesProvider>
+    </Router>
+  );
+}
