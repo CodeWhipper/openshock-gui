@@ -5,7 +5,12 @@ class CollarManager {
         this.collarlist = [];
     }
 
+    clearCollarlist(){
+        this.collarlist = []
+    }
+
     upsertCollar(data) {
+       
         const existing = this.collarlist.find(c => c.get_id() === data.id);
         if (existing) {
             existing.set_name(data.name ?? existing.get_name());
@@ -25,6 +30,7 @@ class CollarManager {
             });
             this.collarlist.push(collar);
         }
+               
     }
 
     add_collar(input) {

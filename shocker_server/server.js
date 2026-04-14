@@ -32,6 +32,11 @@ io.on("connection", (socket) => {
     io.emit("update", manager.get_all_collars());
   });
 
+  socket.on("clearcollars",() => {
+    manager.clearCollarlist();
+    io.emit("update", manager.get_all_collars());
+  })
+
   // Neuen Collar hinzufügen
   socket.on("addCollar", (collarData) => {
     if (isTestingMode) {

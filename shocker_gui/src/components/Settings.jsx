@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNames } from "../utils/NamesContext";
 import "./Settings.css";
+import { socket } from "../socket.js"
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ export default function Settings() {
       >
         Go Back to Shock
       </button>
-
+     
       <table className="settings-table">
         <thead>
           <tr>
@@ -87,6 +88,9 @@ export default function Settings() {
           Add Name
         </button>
       </div>
+       <button onClick={() => {socket.emit("clearcollars"); window.location.reload();}}>
+        Alle Halsbänder zurücksetzen
+      </button>
     </div>
   );
 }

@@ -2,14 +2,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 40px;
-  padding: 20px;
+  gap: 20px;
+  padding: 10px;
 }
 
-/* Row for the two gauges */
 .gauges-row {
   display: flex;
-  gap: 60px; /* space between gauges */
+  gap: 20px;
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -21,9 +20,9 @@
 }
 
 .gauge-title {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  margin-bottom: 10px;
+  margin-bottom: 2px;
   color: #ffffff;
 }
 
@@ -34,25 +33,58 @@
 }
 
 .gauge-input {
-  margin-top: 10px;
-  width: 80px;
+  margin-top: 0; /* fix: kein eigener margin mehr, gauge-input-row übernimmt */
+  width: 60px;
   text-align: center;
   font-weight: bold;
   font-size: 1rem;
   border-bottom: 2px solid #3b82f6;
   outline: none;
   color: #ffffff;
+  background: none;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.gauge-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.gauge-step-btn {
+  background: none;
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+  border-radius: 4px;
+  width: 26px;
+  height: 26px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.gauge-step-btn:hover {
+  background-color: #3b82f6;
+  color: white;
 }
 
 .shock-buttons {
   display: flex;
-  gap: 10px;
+  gap: 5px;
   flex-wrap: wrap;
   justify-content: center;
 }
 
 .btn-shock {
-  padding: 10px 20px;
+  padding: 8px 16px;
   background-color: #4caf50;
   color: white;
   border: none;
@@ -60,19 +92,20 @@
   font-weight: bold;
   cursor: pointer;
 }
+
 .btn-action {
-  padding: 10px 20px;
+  padding: 8px 16px;
   color: white;
-  border:  none;
+  border: none;
   border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
 }
 
 .btn-shock.stop {
-  display: block;               
-  width: 50vw;  
-  margin: 0 auto; 
+  display: block;
+  width: 50vw;
+  margin: 0 auto;
   background-color: #ef4444;
 }
 

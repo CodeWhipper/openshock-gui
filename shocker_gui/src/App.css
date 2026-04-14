@@ -5,30 +5,71 @@
   font-family: sans-serif;
 }
 
+/* Hamburger Button */
+.hamburger-btn {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 200;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px;
+}
+
+.hamburger-btn span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: white;
+  border-radius: 2px;
+}
+
+/* Backdrop */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 299;
+}
+
 /* Sidebar */
 .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 200px;
+  z-index: 300;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
   background-color: #1e1e2f;
   color: white;
-  width: 200px;
-  transition: width 0.3s;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px 0;
 }
 
-.sidebar.collapsed {
-  width: 60px;
+.sidebar--open {
+  transform: translateX(0);
 }
 
-/* Sidebar toggle button */
-.toggle-btn {
+/* Schließen-Button in der Sidebar */
+.sidebar-close-btn {
+  display: block;
+  margin-left: auto;
+  margin-right: 10px;
   background: none;
   border: none;
-  color: white;
-  font-size: 20px;
-  margin-bottom: 20px;
+  font-size: 1.2rem;
   cursor: pointer;
+  color: white;
+  padding: 8px;
+  margin-bottom: 10px;
 }
 
 /* Mode Section */
@@ -130,5 +171,5 @@ input:checked + .slider:before {
 /* Main content */
 .main-content {
   flex: 1;
-  padding: 20px;
+  padding: 1px;
 }

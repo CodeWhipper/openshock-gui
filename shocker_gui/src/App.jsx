@@ -24,77 +24,85 @@ const saveToLocal = (key, value) => {
 };
 
 // === Sidebar Component ===
-function Sidebar({ shockSelection, toggleShockSelection }) {
+function Sidebar({ shockSelection, toggleShockSelection, isOpen, onClose }) {
   const { names, toggleSidebarActive } = useNames();
 
   return (
-    <div className="sidebar">
-      <div className="mode-section">
-        <span className="mode-label">{shockSelection ? "Multimode" : "Singlemode"}</span>
-        <label className="switch">
-          <input
-            type="checkbox"
-            checked={shockSelection}
-            onChange={() => toggleShockSelection(!shockSelection)}
-          />
-          <span className="slider"></span>
-        </label>
-      </div>
+    <>
+      {isOpen && <div className="sidebar-backdrop" onClick={onClose} />}
 
-      <div className="names-section">
-        {names.map((n) => (
-          <div key={n.id} className="name-item">
-            <span>{n.name}</span>
-            <label className="switch">
-              <input
-                type="checkbox"
-                checked={n.sidebarActive}
-                onChange={() => toggleSidebarActive(n.id)}
-              />
-              <span className="slider"></span>
-            </label>
-          </div>
-        ))}
-      </div>
+      <div className={`sidebar ${isOpen ? "sidebar--open" : ""}`}>
+        <button className="sidebar-close-btn" onClick={onClose}>✕</button>
 
-      <nav className="nav-links">
-        <Link to="/settings">Settings</Link>
-      </nav>
-    </div>
+        <div className="mode-section">
+          <span className="mode-label">{shockSelection ? "Multimode" : "Singlemode"}</span>
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={shockSelection}
+              onChange={() => toggleShockSelection(!shockSelection)}
+            />
+            <span className="slider"></span>
+          </label>
+        </div>
+
+        <div className="names-section">
+          {names.map((n) => (
+            <div key={n.id} className="name-item">
+              <span>{n.name}</span>
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  checked={n.sidebarActive}
+                  onChange={() => toggleSidebarActive(n.id)}
+                />
+                <span className="slider"></span>
+              </label>
+            </div>
+          ))}
+        </div>
+
+        <nav className="nav-links">
+          <Link to="/settings" onClick={onClose}>Settings</Link>
+        </nav>
+      </div>
+    </>
   );
 }
 
 // === App Wrapper ===
 function AppWrapper() {
   const location = useLocation();
-  // Sidebar only shows on "/" and "/settings"
   const showSidebar = location.pathname === "/" || location.pathname === "/settings";
 
-  // LocalStorage states
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [shockSelection, setShockSelection] = useState(() => loadFromLocal("shockSelection", false));
   const [percentage, setPercentage] = useState(() => loadFromLocal("shockPercentage", 1));
   const [duration, setDuration] = useState(() => loadFromLocal("shockDuration", 300));
 
-  // Update handlers that sync with LocalStorage
-  const updateShockSelection = (value) => {
-    setShockSelection(value);
-    saveToLocal("shockSelection", value);
-  };
-
-  const updatePercentage = (value) => {
-    setPercentage(value);
-    saveToLocal("shockPercentage", value);
-  };
-
-  const updateDuration = (value) => {
-    setDuration(value);
-    saveToLocal("shockDuration", value);
-  };
+  const updateShockSelection = (value) => { setShockSelection(value); saveToLocal("shockSelection", value); };
+  const updatePercentage     = (value) => { setPercentage(value);     saveToLocal("shockPercentage", value); };
+  const updateDuration       = (value) => { setDuration(value);       saveToLocal("shockDuration", value); };
 
   return (
     <div className="app-container">
       {showSidebar && (
-        <Sidebar shockSelection={shockSelection} toggleShockSelection={updateShockSelection} />
+        <>
+          <button
+            className="hamburger-btn"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Menü öffnen"
+          >
+            <span /><span /><span />
+          </button>
+
+          <Sidebar
+            shockSelection={shockSelection}
+            toggleShockSelection={updateShockSelection}
+            isOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+          />
+        </>
       )}
 
       <div className="main-content">

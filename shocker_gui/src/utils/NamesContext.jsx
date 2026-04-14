@@ -60,8 +60,13 @@ export function NamesProvider({ children }) {
     });
   };
 
+  const toggleSidebarActive = (id) => {
+  updateName(id, "sidebarActive", !names.find(n => n.id === id)?.sidebarActive);
+};
+
+
   return (
-    <NamesContext.Provider value={{ names, updateName, addName }}>
+    <NamesContext.Provider value={{ names, updateName, addName, toggleSidebarActive}}>
       {children}
     </NamesContext.Provider>
   );
