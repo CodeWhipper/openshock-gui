@@ -61,7 +61,7 @@ async function shock_spinning_wheel(collarList, shock_percentage, duration = 300
   const activeCollars = getActiveCollars(collarList);
   if (activeCollars.length === 0) return;
 
-  const spins = Math.floor(Math.random() * activeCollars.length * 3) + 6;
+  const spins = Math.floor(Math.random() * activeCollars.length * 3) + 10;
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   for (let i = 0; i < spins; i++) {
@@ -69,12 +69,12 @@ async function shock_spinning_wheel(collarList, shock_percentage, duration = 300
 
     // Exponentiell verlangsamend: beginnt bei ~100ms, endet bei ~800ms
     const progress = i / (spins - 1); // 0.0 → 1.0
-    const delay = 100 + Math.pow(progress, 2) * 700;
+    const delay = Math.floor(300 + Math.pow(progress, 2) * 1200);
 
     // Intensität steigt mit dem Verlangsamen
     const intensity = Math.floor(20 + progress * 80);
 
-    vibrate_person(collar, intensity, Math.floor(delay * 0.8));
+    vibrate_person(collar, intensity, delay);
     await wait(delay);
   }
 
