@@ -74,7 +74,7 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
           d="M20,120 A100,100 0 0,1 220,120"
           fill="none"
           stroke="url(#gradient)"
-          strokeWidth="10"
+          strokeWidth="20"
           strokeLinecap="round"
         />
         <defs>
@@ -148,9 +148,9 @@ export default function Shock({ percentage, setPercentage, duration, setDuration
       </div>
 
       <div className="shock-buttons">
-        <button onClick={() => runOnTarget(shock_person)}><FaBolt /></button>
-        <button onClick={() => runOnTarget(vibrate_person)}><LuVibrate /></button>
-        <button onClick={() => runOnTarget(sound_person)}><FaVolumeUp /></button>
+        <button style={{height:"60px", width:"60px"}}  onClick={() => runOnTarget(shock_person)}><FaBolt /></button>
+        <button style={{height:"60px", width:"60px"}} onClick={() => runOnTarget(vibrate_person)}><LuVibrate /></button>
+        <button style={{height:"60px", width:"60px"}} onClick={() => runOnTarget(sound_person)}><FaVolumeUp /></button>
       </div>
 
       <div>
@@ -158,9 +158,9 @@ export default function Shock({ percentage, setPercentage, duration, setDuration
       </div>
 
       <div className="shock-buttons">
-        <button onClick={() => shock_all(targetNames, percentage, duration)}>Shock All</button>
-        <button onClick={() => shock_random(targetNames, percentage, duration)}>Shock Random</button>
-        <button onClick={() => shock_spinning_wheel(targetNames, percentage, duration)}>Wheel of Pain</button>
+        <button   onClick={() => shock_all(targetNames, percentage, duration)}>Shock All</button>
+        <button  onClick={() => shock_random(targetNames, percentage, duration)}>Shock Random</button>
+        <button  onClick={() => shock_spinning_wheel(targetNames, percentage, duration)}>Wheel of Pain</button>
       </div>
 
       <div style={{ marginTop: "20px" }}>

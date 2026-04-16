@@ -35,6 +35,7 @@
 .gauge-input {
   margin-top: 0; /* fix: kein eigener margin mehr, gauge-input-row übernimmt */
   width: 60px;
+  height: 40px;
   text-align: center;
   font-weight: bold;
   font-size: 1rem;
@@ -58,8 +59,8 @@
   border: 1px solid #3b82f6;
   color: #3b82f6;
   border-radius: 4px;
-  width: 26px;
-  height: 26px;
+  width: 40px;
+  height: 40px;
   font-size: 1.1rem;
   cursor: pointer;
   line-height: 1;
@@ -79,11 +80,13 @@
 .shock-buttons {
   display: flex;
   gap: 5px;
+  
   flex-wrap: wrap;
   justify-content: center;
 }
 
 .btn-shock {
+
   padding: 8px 16px;
   background-color: #4caf50;
   color: white;
