@@ -24,8 +24,11 @@ const saveToLocal = (key, value) => {
 };
 
 // === Sidebar Component ===
-function Sidebar({ shockSelection, toggleShockSelection, isOpen, onClose }) {
-  const { names, toggleSidebarActive } = useNames();
+function Sidebar({ shockSelection, toggleShockSelection, selectedIds, toggleSidebarActive, isOpen, onClose }) {
+  const { names } = useNames();
+
+  // Only show names that are marked active in Settings
+  const activeNames = names.filter((n) => n.active);
 
   return (
     <>
@@ -47,13 +50,13 @@ function Sidebar({ shockSelection, toggleShockSelection, isOpen, onClose }) {
         </div>
 
         <div className="names-section">
-          {names.map((n) => (
+          {activeNames.map((n) => (
             <div key={n.id} className="name-item">
               <span>{n.name}</span>
               <label className="switch">
                 <input
                   type="checkbox"
-                  checked={n.sidebarActive}
+                  checked={selectedIds.includes(n.id)}
                   onChange={() => toggleSidebarActive(n.id)}
                 />
                 <span className="slider"></span>
@@ -80,9 +83,52 @@ function AppWrapper() {
   const [percentage, setPercentage] = useState(() => loadFromLocal("shockPercentage", 1));
   const [duration, setDuration] = useState(() => loadFromLocal("shockDuration", 300));
 
-  const updateShockSelection = (value) => { setShockSelection(value); saveToLocal("shockSelection", value); };
-  const updatePercentage     = (value) => { setPercentage(value);     saveToLocal("shockPercentage", value); };
-  const updateDuration       = (value) => { setDuration(value);       saveToLocal("shockDuration", value); };
+  // Local-only sidebar selection — never sent to backend
+  const [selectedIds, setSelectedIds] = useState(() => {
+    const isMulti = loadFromLocal("shockSelection", false);
+    if (isMulti) {
+      return loadFromLocal("multiModeSelections", []);
+    } else {
+      const single = loadFromLocal("singleModeSelection", null);
+      return single !== null ? [single] : [];
+    }
+  });
+
+  // Toggle single/multi mode and swap stored selections
+  const updateShockSelection = (value) => {
+    if (value) {
+      // Switching TO multimode: save current single, restore saved multi
+      saveToLocal("multiModeSelections", loadFromLocal("multiModeSelections", []));
+      setSelectedIds(loadFromLocal("multiModeSelections", []));
+    } else {
+      // Switching TO singlemode: save current multi, restore saved single
+      saveToLocal("multiModeSelections", selectedIds);
+      const single = loadFromLocal("singleModeSelection", null);
+      setSelectedIds(single !== null ? [single] : []);
+    }
+    setShockSelection(value);
+    saveToLocal("shockSelection", value);
+  };
+
+  // Toggle a person in the sidebar (local only, no backend)
+  const toggleSidebarActive = (id) => {
+    if (shockSelection) {
+      // Multi mode: toggle on/off
+      const newIds = selectedIds.includes(id)
+        ? selectedIds.filter((i) => i !== id)
+        : [...selectedIds, id];
+      setSelectedIds(newIds);
+      saveToLocal("multiModeSelections", newIds);
+    } else {
+      // Single mode: deselect if already selected, else select exclusively
+      const newIds = selectedIds[0] === id ? [] : [id];
+      setSelectedIds(newIds);
+      if (newIds.length > 0) saveToLocal("singleModeSelection", id);
+    }
+  };
+
+  const updatePercentage = (value) => { setPercentage(value); saveToLocal("shockPercentage", value); };
+  const updateDuration   = (value) => { setDuration(value);   saveToLocal("shockDuration", value); };
 
   return (
     <div className="app-container">
@@ -99,6 +145,8 @@ function AppWrapper() {
           <Sidebar
             shockSelection={shockSelection}
             toggleShockSelection={updateShockSelection}
+            selectedIds={selectedIds}
+            toggleSidebarActive={toggleSidebarActive}
             isOpen={sidebarOpen}
             onClose={() => setSidebarOpen(false)}
           />
@@ -115,6 +163,7 @@ function AppWrapper() {
                 setPercentage={updatePercentage}
                 duration={duration}
                 setDuration={updateDuration}
+                selectedIds={selectedIds}
               />
             }
           />

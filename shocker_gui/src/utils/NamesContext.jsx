@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { socket } from "../socket"; 
+import { socket } from "../socket";
 
-// Create context for names
 const NamesContext = createContext();
 
 export function NamesProvider({ children }) {
@@ -14,7 +13,6 @@ export function NamesProvider({ children }) {
       setNames(serverNames);
       setInitialized(true);
     };
-
     socket.on("update", handleUpdate);
     return () => socket.off("update", handleUpdate);
   }, []);
@@ -23,17 +21,17 @@ export function NamesProvider({ children }) {
   useEffect(() => {
     if (!initialized) {
       import("../Api_calls/Api_calls").then(({ get_shockers }) => {
-        get_shockers().then(shockers => {
+        get_shockers().then((shockers) => {
           socket.emit("syncCollars", shockers);
         });
       });
     }
   }, [initialized]);
 
-  // Update a name's property
+  // Update a name's property and sync to backend
   const updateName = (id, key, value) => {
-    setNames(prevNames => {
-      const updatedNames = prevNames.map(n => 
+    setNames((prevNames) => {
+      const updatedNames = prevNames.map((n) =>
         n.id === id ? { ...n, [key]: value } : n
       );
       socket.emit("updateCollar", { id, data: { [key]: value } });
@@ -43,8 +41,10 @@ export function NamesProvider({ children }) {
 
   // Add a new name
   const addName = (newName) => {
-    setNames(prevNames => {
-      const nextId = prevNames.length ? Math.max(...prevNames.map(n => n.id)) + 1 : 1;
+    setNames((prevNames) => {
+      const nextId = prevNames.length
+        ? Math.max(...prevNames.map((n) => n.id)) + 1
+        : 1;
       const newCollar = {
         id: nextId,
         name: newName,
@@ -54,19 +54,15 @@ export function NamesProvider({ children }) {
         game_wheel: false,
         game_tick: false,
         game_mine: false,
+        // Note: sidebarActive is intentionally NOT here — it is local-only state in App.jsx
       };
       socket.emit("addCollar", newCollar);
       return [...prevNames, newCollar];
     });
   };
 
-  const toggleSidebarActive = (id) => {
-  updateName(id, "sidebarActive", !names.find(n => n.id === id)?.sidebarActive);
-};
-
-
   return (
-    <NamesContext.Provider value={{ names, updateName, addName, toggleSidebarActive}}>
+    <NamesContext.Provider value={{ names, updateName, addName }}>
       {children}
     </NamesContext.Provider>
   );
