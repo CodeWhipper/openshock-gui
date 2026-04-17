@@ -1,8 +1,11 @@
 /* Container layout */
 .app-container {
   display: flex;
-  height: 100vh;
+  height: 100svh;;
+  width: 100vw;
   font-family: sans-serif;
+  touch-action: manipulation;
+  overscroll-behavior: none;
 }
 
 /* Hamburger Button */
@@ -38,6 +41,7 @@
 
 /* Sidebar */
 .sidebar {
+  
   position: fixed;
   top: 0;
   left: 0;
