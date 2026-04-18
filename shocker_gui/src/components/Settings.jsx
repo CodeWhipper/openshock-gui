@@ -37,8 +37,8 @@ export default function Settings() {
               <th>Max Shock</th>
               <th>Random</th>
               <th>Wheel</th>
-              <th>Tick</th>
-              <th>Mine</th>
+              {/*<th>Tick</th>
+              <th>Mine</th>*/}
             </tr>
           </thead>
           <tbody>
@@ -75,7 +75,7 @@ export default function Settings() {
                     updateName(n.id, "game_wheel", !n.game_wheel)
                   )}
                 </td>
-                <td>
+                {/*<td>
                   {renderSwitch(n.game_tick, () =>
                     updateName(n.id, "game_tick", !n.game_tick)
                   )}
@@ -84,7 +84,7 @@ export default function Settings() {
                   {renderSwitch(n.game_mine, () =>
                     updateName(n.id, "game_mine", !n.game_mine)
                   )}
-                </td>
+                </td>*/}
               </tr>
             ))}
           </tbody>
