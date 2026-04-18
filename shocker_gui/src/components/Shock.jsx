@@ -141,7 +141,6 @@ export default function Shock({ percentage, setPercentage, duration, setDuration
           background: "var(--color-background-primary, black)",
           borderRadius: 8,
           border: "0.5px solid rgba(0,0,0,0.12)",
-          marginBottom: 16,
           fontSize: 13,
           cursor: "pointer",
           userSelect: "none",
