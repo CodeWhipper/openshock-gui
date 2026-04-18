@@ -209,7 +209,7 @@ export default function Shock({ percentage, setPercentage, duration, setDuration
         </div>
       )}
 
-      <div style={{ marginTop: "20px" }}>
+      {/*<div style={{ marginTop: "20px" }}>
         <button onClick={() => navigate("/mindsweeper")} className="btn-shock mindsweeper">
           Go to Mindsweeper
         </button>
@@ -218,7 +218,7 @@ export default function Shock({ percentage, setPercentage, duration, setDuration
         <button onClick={() => navigate("/tictactoe")} className="btn-shock TicTacToe">
           Go to TicTacToe
         </button>
-      </div>
+      </div>*/}
     </div>
   );
 }
