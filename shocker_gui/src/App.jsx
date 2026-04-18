@@ -7,7 +7,6 @@ import TicTacToe from "./components/TicTacToe";
 import { NamesProvider, useNames } from "./utils/NamesContext";
 import "./App.css";
 
-// === LocalStorage Helpers ===
 const loadFromLocal = (key, defaultValue) => {
   try {
     const stored = localStorage.getItem(key);
@@ -23,17 +22,13 @@ const saveToLocal = (key, value) => {
   } catch {}
 };
 
-// === Sidebar Component ===
 function Sidebar({ shockSelection, toggleShockSelection, selectedIds, toggleSidebarActive, isOpen, onClose }) {
   const { names } = useNames();
-
-  // Only show names that are marked active in Settings
   const activeNames = names.filter((n) => n.active);
 
   return (
     <>
       {isOpen && <div className="sidebar-backdrop" onClick={onClose} />}
-
       <div className={`sidebar ${isOpen ? "sidebar--open" : ""}`}>
         <button className="sidebar-close-btn" onClick={onClose}>✕</button>
 
@@ -73,7 +68,6 @@ function Sidebar({ shockSelection, toggleShockSelection, selectedIds, toggleSide
   );
 }
 
-// === App Wrapper ===
 function AppWrapper() {
   const location = useLocation();
   const showSidebar = location.pathname === "/" || location.pathname === "/settings";
@@ -83,7 +77,6 @@ function AppWrapper() {
   const [percentage, setPercentage] = useState(() => loadFromLocal("shockPercentage", 1));
   const [duration, setDuration] = useState(() => loadFromLocal("shockDuration", 300));
 
-  // Local-only sidebar selection — never sent to backend
   const [selectedIds, setSelectedIds] = useState(() => {
     const isMulti = loadFromLocal("shockSelection", false);
     if (isMulti) {
@@ -94,14 +87,11 @@ function AppWrapper() {
     }
   });
 
-  // Toggle single/multi mode and swap stored selections
   const updateShockSelection = (value) => {
     if (value) {
-      // Switching TO multimode: save current single, restore saved multi
       saveToLocal("multiModeSelections", loadFromLocal("multiModeSelections", []));
       setSelectedIds(loadFromLocal("multiModeSelections", []));
     } else {
-      // Switching TO singlemode: save current multi, restore saved single
       saveToLocal("multiModeSelections", selectedIds);
       const single = loadFromLocal("singleModeSelection", null);
       setSelectedIds(single !== null ? [single] : []);
@@ -110,17 +100,14 @@ function AppWrapper() {
     saveToLocal("shockSelection", value);
   };
 
-  // Toggle a person in the sidebar (local only, no backend)
   const toggleSidebarActive = (id) => {
     if (shockSelection) {
-      // Multi mode: toggle on/off
       const newIds = selectedIds.includes(id)
         ? selectedIds.filter((i) => i !== id)
         : [...selectedIds, id];
       setSelectedIds(newIds);
       saveToLocal("multiModeSelections", newIds);
     } else {
-      // Single mode: deselect if already selected, else select exclusively
       const newIds = selectedIds[0] === id ? [] : [id];
       setSelectedIds(newIds);
       if (newIds.length > 0) saveToLocal("singleModeSelection", id);
@@ -164,6 +151,8 @@ function AppWrapper() {
                 duration={duration}
                 setDuration={updateDuration}
                 selectedIds={selectedIds}
+                shockSelection={shockSelection}
+                toggleShockSelection={updateShockSelection}
               />
             }
           />
@@ -176,7 +165,6 @@ function AppWrapper() {
   );
 }
 
-// === Main App ===
 export default function App() {
   return (
     <Router>

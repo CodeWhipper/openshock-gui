@@ -74,7 +74,7 @@ async function shock_spinning_wheel(collarList, shock_percentage, duration = 300
     // Intensität steigt mit dem Verlangsamen
     const intensity = Math.floor(20 + progress * 80);
 
-    vibrate_person(collar, intensity, delay);
+    sound_person(collar, intensity, delay);
     await wait(delay);
   }
 

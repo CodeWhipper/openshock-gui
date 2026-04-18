@@ -14,12 +14,10 @@ import { FaBolt, FaVolumeUp } from "react-icons/fa";
 import { LuVibrate } from "react-icons/lu";
 import "./Shock.css";
 
-// === Interactive Gauge Component ===
 function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSeconds = false, integerOnly = false, exponent = 1 }) {
   const svgRef = useRef(null);
 
   const clampValue = (v) => Math.max(min, Math.min(max, v));
-
   const valueToNorm = (v) => Math.pow((v - min) / (max - min), 1 / exponent);
   const normToValue = (n) => min + Math.pow(n, exponent) * (max - min);
 
@@ -54,7 +52,6 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
   const needleY = 120 - needleLength * Math.sin((angle * Math.PI) / 180);
 
   const step = displayInSeconds ? 100 : 1;
-
   const increment = () => setValue(clampValue(Math.round(value + step)));
   const decrement = () => setValue(clampValue(Math.round(value - step)));
 
@@ -114,20 +111,67 @@ function InteractiveGauge({ min = 0, max = 100, value, setValue, displayInSecond
   );
 }
 
-// === Shock Component ===
-export default function Shock({ percentage, setPercentage, duration, setDuration, selectedIds }) {
+export default function Shock({ percentage, setPercentage, duration, setDuration, selectedIds, shockSelection, toggleShockSelection }) {
   const { names } = useNames();
   const navigate = useNavigate();
 
-  // Only operate on names that are both active in Settings AND selected in the sidebar
-  const targetNames = names.filter(
-    (n) => n.active && selectedIds.includes(n.id)
-  );
+  // Basis: aktiv in Settings UND in der Sidebar ausgewählt
+  const targetNames = names.filter((n) => n.active && selectedIds.includes(n.id));
+
+  // Random und Wheel berücksichtigen zusätzlich die jeweiligen Settings-Schalter
+  const randomTargets = targetNames.filter((n) => n.game_random);
+  const wheelTargets  = targetNames.filter((n) => n.game_wheel);
 
   const runOnTarget = (fn) => targetNames.forEach((n) => fn(n, percentage, duration));
 
+  const modeBg    = shockSelection ? "#E1F5EE" : "#E6F1FB";
+  const modeColor = shockSelection ? "#085041" : "#0C447C";
+
   return (
     <div className="shock-page">
+
+      {/* Kompakter Status-Streifen – Klick togglet den Modus */}
+      <div
+        onClick={() => toggleShockSelection(!shockSelection)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "5px 10px",
+          background: "var(--color-background-primary, black)",
+          borderRadius: 8,
+          border: "0.5px solid rgba(0,0,0,0.12)",
+          marginBottom: 16,
+          fontSize: 13,
+          cursor: "pointer",
+          userSelect: "none",
+          width: "fit-content",
+        }}
+      >
+        <span style={{
+          fontSize: 11,
+          fontWeight: 500,
+          padding: "2px 7px",
+          borderRadius: 99,
+          background: modeBg,
+          color: modeColor,
+          flexShrink: 0,
+        }}>
+          {shockSelection ? "Multi" : "Single"}
+        </span>
+
+        {targetNames.length === 0 ? (
+          <span style={{ color: "#888", fontStyle: "italic" }}>niemand ausgewählt</span>
+        ) : (
+          targetNames.map((n, i) => (
+            <span key={n.id} style={{ fontWeight: 500 }}>
+              {i > 0 && <span style={{ color: "#bbb", margin: "0 2px" }}>·</span>}
+              {n.name}
+            </span>
+          ))
+        )}
+      </div>
+
       <div className="gauges-row">
         <div className="gauge-section">
           <h2 className="gauge-title">Stärke</h2>
@@ -148,20 +192,22 @@ export default function Shock({ percentage, setPercentage, duration, setDuration
       </div>
 
       <div className="shock-buttons">
-        <button style={{height:"60px", width:"60px"}}  onClick={() => runOnTarget(shock_person)}><FaBolt /></button>
-        <button style={{height:"60px", width:"60px"}} onClick={() => runOnTarget(vibrate_person)}><LuVibrate /></button>
-        <button style={{height:"60px", width:"60px"}} onClick={() => runOnTarget(sound_person)}><FaVolumeUp /></button>
+        <button style={{ height: "60px", width: "60px" }} onClick={() => runOnTarget(shock_person)}><FaBolt /></button>
+        <button style={{ height: "60px", width: "60px" }} onClick={() => runOnTarget(vibrate_person)}><LuVibrate /></button>
+        <button style={{ height: "60px", width: "60px" }} onClick={() => runOnTarget(sound_person)}><FaVolumeUp /></button>
       </div>
 
       <div>
         <button onClick={() => stop_all(targetNames)} className="btn-shock stop">Stop All</button>
       </div>
 
-      <div className="shock-buttons">
-        <button   onClick={() => shock_all(targetNames, percentage, duration)}>Shock All</button>
-        <button  onClick={() => shock_random(targetNames, percentage, duration)}>Shock Random</button>
-        <button  onClick={() => shock_spinning_wheel(targetNames, percentage, duration)}>Wheel of Pain</button>
-      </div>
+      {shockSelection && (
+        <div className="shock-buttons">
+          <button onClick={() => shock_all(targetNames, percentage, duration)}>Shock All</button>
+          <button onClick={() => shock_random(randomTargets, percentage, duration)}>Shock Random</button>
+          <button onClick={() => shock_spinning_wheel(wheelTargets, percentage, duration)}>Wheel of Pain</button>
+        </div>
+      )}
 
       <div style={{ marginTop: "20px" }}>
         <button onClick={() => navigate("/mindsweeper")} className="btn-shock mindsweeper">
