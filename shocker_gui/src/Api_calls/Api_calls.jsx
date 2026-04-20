@@ -31,7 +31,7 @@ async function get_hub_id() {
     }
     let hub_id = await make_api_call('https://api.openshock.app/1/devices', null)
     console.log(hub_id);
-    hub_id = hub_id.data[1].id
+    hub_id = hub_id.data[0].id
     return hub_id
 }
 
