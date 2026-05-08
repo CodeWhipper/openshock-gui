@@ -1,0 +1,126 @@
+.mindsweeper-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  color: #111827;
+}
+
+.mindsweeper-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+}
+
+.mindsweeper-header h1 {
+  color: white;
+}
+
+.mindsweeper-info {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 0.95rem;
+  color: white;
+}
+
+.mindsweeper-result {
+  margin-top: 14px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  color: white;
+  font-weight: 700;
+  text-align: center;
+}
+
+.mode-toggle {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.mode-toggle:hover {
+  background: #2563eb;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(9, 44px);
+  gap: 6px;
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid #cbd5e1;
+}
+
+.row {
+  display: contents;
+}
+
+.cell {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid #94a3b8;
+  background: #e2e8f0;
+  color: #111827;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.cell:hover {
+  filter: brightness(1.03);
+}
+
+.cell.revealed {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  cursor: default;
+}
+
+.cell.revealed.mine {
+  background: #fecaca;
+  border-color: #f87171;
+}
+
+.cell.flagged {
+  background: #fde68a;
+}
+
+.btn-action {
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn-action:hover {
+  background: #1d4ed8;
+}
+
+.btn-back {
+  background: #475569;
+}
+
+.btn-back:hover {
+  background: #334155;
+}
