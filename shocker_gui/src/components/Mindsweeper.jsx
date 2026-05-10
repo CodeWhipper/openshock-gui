@@ -4,8 +4,11 @@ import { useNames } from "../utils/NamesContext";
 import "./Mindsweeper.css";
 import { shock_person } from '../shock_modes';
 
-const BOARD_SIZE = 9;
-const MINE_COUNT = 10;
+const DIFFICULTY_LEVELS = {
+  easy: { name: 'Easy', rows: 8, cols: 8, mines: 10 },
+  medium: { name: 'Medium', rows: 16, cols: 16, mines: 40 },
+  hard: { name: 'Hard', rows: 30, cols: 16, mines: 99 },
+};
 
 function createCell() {
   return {
@@ -110,18 +113,29 @@ function checkWin(board) {
 export default function Mindsweeper() {
   const { names } = useNames();
   const navigate = useNavigate();
+  const [difficulty, setDifficulty] = useState(null);
   const [board, setBoard] = useState([]);
   const [gameStatus, setGameStatus] = useState('playing');
-  const [message, setMessage] = useState('Click a cell to start.');
+  const [message, setMessage] = useState('Choose a difficulty to start.');
   const [isFlagMode, setIsFlagMode] = useState(false);
   const [firstClick, setFirstClick] = useState(true);
 
+  const boardRows = difficulty ? DIFFICULTY_LEVELS[difficulty].rows : 0;
+  const boardCols = difficulty ? DIFFICULTY_LEVELS[difficulty].cols : 0;
+  const mineCount = difficulty ? DIFFICULTY_LEVELS[difficulty].mines : 0;
+
   useEffect(() => {
-    // Initialize empty board
-    setBoard(Array.from({ length: BOARD_SIZE }, () =>
-      Array.from({ length: BOARD_SIZE }, createCell)
-    ));
-  }, []);
+    if (difficulty) {
+      // Initialize empty board when difficulty is selected
+      setBoard(Array.from({ length: boardRows }, () =>
+        Array.from({ length: boardCols }, createCell)
+      ));
+      setGameStatus('playing');
+      setMessage('Click a cell to start.');
+      setIsFlagMode(false);
+      setFirstClick(true);
+    }
+  }, [difficulty, boardRows, boardCols]);
 
   const activeTargets = names.filter((n) => n.active && (n.game_mine ?? true));
   const shockTargets = activeTargets.length > 0 ? activeTargets : names.filter((n) => n.active);
@@ -135,8 +149,8 @@ export default function Mindsweeper() {
     let nextBoard = cloneBoard(board);
 
     if (firstClick) {
-      // Generate board with mines, avoiding the clicked cell
-      nextBoard = initializeBoard(BOARD_SIZE, BOARD_SIZE, MINE_COUNT, row, col);
+      // Generate board with mines, avoiding the clicked cell and neighbors
+      nextBoard = initializeBoard(boardRows, boardCols, mineCount, row, col);
       setFirstClick(false);
     }
 
@@ -185,17 +199,57 @@ export default function Mindsweeper() {
   };
 
   const resetGame = () => {
-    setBoard(Array.from({ length: BOARD_SIZE }, () =>
-      Array.from({ length: BOARD_SIZE }, createCell)
-    ));
+    setDifficulty(null);
+    setBoard([]);
     setGameStatus('playing');
-    setMessage('Click a cell to start.');
+    setMessage('Choose a difficulty to start.');
     setIsFlagMode(false);
     setFirstClick(true);
   };
 
   const flaggedCount = board.flat().filter((cell) => cell.isFlagged).length;
-  const minesRemaining = Math.max(0, MINE_COUNT - flaggedCount);
+
+  const selectDifficulty = (level) => {
+    setDifficulty(level);
+  };
+
+  if (!difficulty) {
+    return (
+      <div className="mindsweeper-page">
+        <div className="mindsweeper-header">
+          <h1>Mindsweeper</h1>
+        </div>
+
+        <div className="difficulty-selection">
+          <p>Select Difficulty</p>
+          <div className="difficulty-buttons">
+            <button
+              onClick={() => selectDifficulty('easy')}
+              className="difficulty-btn difficulty-easy"
+            >
+              Easy<br/><span className="difficulty-desc">8x8, 10 mines</span>
+            </button>
+            <button
+              onClick={() => selectDifficulty('medium')}
+              className="difficulty-btn difficulty-medium"
+            >
+              Medium<br/><span className="difficulty-desc">16x16, 40 mines</span>
+            </button>
+            <button
+              onClick={() => selectDifficulty('hard')}
+              className="difficulty-btn difficulty-hard"
+            >
+              Hard<br/><span className="difficulty-desc">30x16, 99 mines</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="mindsweeper-actions">
+          <button onClick={() => navigate('/')} className="btn-action btn-back">Back to Home</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mindsweeper-page">
@@ -204,13 +258,15 @@ export default function Mindsweeper() {
       </div>
 
       <div className="mindsweeper-info">
-        <span>Flags: {flaggedCount} / {MINE_COUNT}</span>
+        <span>Flags: {flaggedCount} / {mineCount}</span>
         <button onClick={() => setIsFlagMode(!isFlagMode)} className="btn-action mode-toggle">
           {isFlagMode ? '🚩 Flag Mode' : '💣 Reveal Mode'}
         </button>
       </div>
 
-      <div className="board">
+      <div className="board" style={{
+        gridTemplateColumns: `repeat(${boardCols}, 44px)`
+      }}>
         {board.map((row, r) => (
           <div key={r} className="row">
             {row.map((cell, c) => {
@@ -252,8 +308,8 @@ export default function Mindsweeper() {
       )}
 
       <div className="mindsweeper-actions">
-        <button onClick={resetGame} className="btn-action">New Game</button>
-        <button onClick={() => navigate('/')} className="btn-action btn-back">Back to Shock</button>
+        <button onClick={resetGame} className="btn-action">Give Up</button>
+        <button onClick={() => navigate('/')} className="btn-action btn-back">Back to Home</button>
       </div>
     </div>
   );
