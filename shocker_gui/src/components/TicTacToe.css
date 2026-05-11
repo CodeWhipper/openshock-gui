@@ -1,0 +1,388 @@
+.tictactoe-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(7px, 1.5svh, 16px);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: clamp(7px, 1.8vmin, 20px);
+  box-sizing: border-box;
+  overflow: hidden;
+  color: #f8fafc;
+  --tictactoe-board-size: 240px;
+  --tictactoe-board-gap: 8px;
+  --tictactoe-board-padding: 10px;
+  --tictactoe-cell-font-size: 64px;
+}
+
+.tictactoe-page.setup-open {
+  justify-content: flex-start;
+  overflow-y: auto;
+}
+
+.tictactoe-page.game-open {
+  overflow: hidden;
+}
+
+.tictactoe-header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tictactoe-header h1 {
+  margin: 0;
+  font-size: clamp(1.4rem, 4vmin, 2.5rem);
+  line-height: 1;
+}
+
+.mode-pill {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #0c4a6e;
+  font-size: clamp(0.78rem, 2vmin, 0.95rem);
+  font-weight: 800;
+}
+
+.team-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  flex: 0 0 auto;
+  gap: clamp(7px, 1.6vmin, 14px);
+  width: min(100%, 720px);
+}
+
+.setup-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(10px, 2vmin, 16px);
+  width: min(100%, 780px);
+  min-height: 0;
+}
+
+.setup-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+}
+
+.setup-heading h2 {
+  margin: 0;
+  font-size: clamp(1.05rem, 3vmin, 1.4rem);
+}
+
+.setup-heading p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: clamp(0.8rem, 2vmin, 0.95rem);
+  font-weight: 700;
+}
+
+.assignment-buttons {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.assignment-buttons button {
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #f8fafc;
+  font-size: clamp(0.78rem, 2vmin, 0.92rem);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.assignment-buttons button.selected {
+  border-color: #38bdf8;
+  background: #dbeafe;
+  color: #0c4a6e;
+}
+
+.assignment-buttons button:disabled,
+.tictactoe-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.player-assignment-list {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.player-assignment-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) minmax(0, 2.2fr);
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.player-name {
+  min-width: 0;
+  overflow: hidden;
+  color: #f8fafc;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assignment-buttons {
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.team-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(6px, 1.5vmin, 10px);
+  min-width: 0;
+  padding: clamp(7px, 1.6vmin, 14px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.team-card.active {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.18);
+}
+
+.team-symbol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(28px, 6vmin, 48px);
+  height: clamp(28px, 6vmin, 48px);
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #111827;
+  font-size: clamp(1rem, 3.3vmin, 1.8rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.team-details {
+  min-width: 0;
+}
+
+.team-details h2,
+.team-details p {
+  margin: 0;
+}
+
+.team-details h2 {
+  font-size: clamp(0.85rem, 2.3vmin, 1.05rem);
+}
+
+.team-details p {
+  margin-top: 2px;
+  overflow: hidden;
+  color: #cbd5e1;
+  font-size: clamp(0.78rem, 2vmin, 0.95rem);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-status {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: min(100%, 720px);
+  padding: clamp(6px, 1.4vmin, 8px) 12px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  text-align: center;
+  font-size: clamp(0.86rem, 2.1vmin, 1.1rem);
+  font-weight: 800;
+}
+
+.game-status.warning {
+  background: rgba(251, 191, 36, 0.16);
+  color: #fde68a;
+}
+
+.setup-open .game-status,
+.setup-open .game-status.warning {
+  padding: 0;
+  background: transparent;
+}
+
+.result-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  color: #dbeafe;
+  font-size: clamp(0.78rem, 2vmin, 0.95rem);
+  font-weight: 700;
+}
+
+.tictactoe-board-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.tictactoe-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  flex: 0 0 auto;
+  gap: var(--tictactoe-board-gap);
+  width: var(--tictactoe-board-size);
+  height: var(--tictactoe-board-size);
+  aspect-ratio: 1 / 1;
+  max-width: 100%;
+  max-height: 100%;
+  padding: var(--tictactoe-board-padding);
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: #e2e8f0;
+}
+
+.tictactoe-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border: 1px solid #94a3b8;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #111827;
+  font-size: var(--tictactoe-cell-font-size);
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tictactoe-cell:hover:not(:disabled) {
+  background: #e0f2fe;
+}
+
+.tictactoe-cell:disabled {
+  cursor: default;
+}
+
+.tictactoe-cell.filled {
+  background: #ffffff;
+}
+
+.tictactoe-cell.winning {
+  border-color: #16a34a;
+  background: #bbf7d0;
+}
+
+.tictactoe-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(6px, 1.5vmin, 10px);
+}
+
+.tictactoe-action {
+  padding: clamp(6px, 1.6vmin, 11px) clamp(12px, 2.6vmin, 20px);
+  border: none;
+  border-radius: 999px;
+  background: #2563eb;
+  color: white;
+  font-size: clamp(0.8rem, 1.9vmin, 1rem);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.tictactoe-action:hover {
+  background: #1d4ed8;
+}
+
+.tictactoe-action.secondary {
+  background: #475569;
+}
+
+.tictactoe-action.secondary:hover {
+  background: #334155;
+}
+
+@media (max-width: 560px) {
+  .setup-open .team-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .setup-heading {
+    justify-content: center;
+  }
+
+  .setup-heading p {
+    text-align: center;
+  }
+
+  .player-assignment-row {
+    grid-template-columns: 1fr;
+  }
+
+  .assignment-buttons {
+    justify-content: flex-start;
+  }
+
+  .team-details p {
+    white-space: nowrap;
+  }
+}
+
+@media (max-height: 640px) {
+  .tictactoe-page {
+    gap: 5px;
+    padding: 5px;
+  }
+
+  .team-card {
+    padding: 5px 7px;
+  }
+
+  .team-details h2 {
+    font-size: 0.78rem;
+  }
+
+  .team-details p {
+    font-size: 0.72rem;
+  }
+
+  .game-status {
+    padding: 5px 8px;
+  }
+
+  .tictactoe-action {
+    padding: 5px 10px;
+  }
+}
