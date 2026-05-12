@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNames } from "../utils/NamesContext";
 import "./TicTacToe.css";
@@ -19,8 +19,8 @@ const WINNING_LINES = [
 ];
 
 const SYMBOL_LABELS = {
-  X: "Cross",
-  O: "Circle",
+  X: "X",
+  O: "O",
 };
 
 function createEmptyBoard() {
@@ -96,17 +96,10 @@ function getMemberNames(members) {
 export default function TicTacToe({ shockSelection = false }) {
   const navigate = useNavigate();
   const { names } = useNames();
-  const boardAreaRef = useRef(null);
   const [assignments, setAssignments] = useState({});
   const [gameConfig, setGameConfig] = useState(null);
   const [board, setBoard] = useState(createEmptyBoard);
   const [currentSymbol, setCurrentSymbol] = useState("X");
-  const [boardLayout, setBoardLayout] = useState({
-    size: 240,
-    gap: 8,
-    padding: 10,
-    fontSize: 64,
-  });
 
   const availablePlayers = useMemo(() => {
     const activePlayers = names.filter((name) => name.active);
@@ -174,49 +167,6 @@ export default function TicTacToe({ shockSelection = false }) {
   const winnerTeam = gameResult.symbol ? teams[gameResult.symbol] : [];
   const loserSymbol = gameResult.symbol ? getNextSymbol(gameResult.symbol) : null;
   const loserTeam = loserSymbol ? teams[loserSymbol] : [];
-
-  useLayoutEffect(() => {
-    if (!gameStarted || !boardAreaRef.current) return;
-
-    const boardArea = boardAreaRef.current;
-
-    const updateBoardLayout = () => {
-      const { width, height } = boardArea.getBoundingClientRect();
-      if (width <= 0 || height <= 0) return;
-
-      const shortestSide = Math.min(width, height);
-      const size = Math.max(1, Math.floor(shortestSide));
-      const gap = Math.max(3, Math.min(10, Math.round(size * 0.025)));
-      const padding = Math.max(6, Math.min(12, Math.round(size * 0.035)));
-      const cellSize = Math.max(1, Math.floor((size - padding * 2 - gap * 2) / 3));
-      const fontSize = Math.max(8, Math.round(cellSize * 0.62));
-
-      setBoardLayout((current) => {
-        if (
-          current.size === size &&
-          current.gap === gap &&
-          current.padding === padding &&
-          current.fontSize === fontSize
-        ) {
-          return current;
-        }
-
-        return { size, gap, padding, fontSize };
-      });
-    };
-
-    updateBoardLayout();
-
-    const resizeObserver =
-      typeof ResizeObserver !== "undefined" ? new ResizeObserver(updateBoardLayout) : null;
-    resizeObserver?.observe(boardArea);
-    window.addEventListener("resize", updateBoardLayout);
-
-    return () => {
-      resizeObserver?.disconnect();
-      window.removeEventListener("resize", updateBoardLayout);
-    };
-  }, [gameStarted]);
 
   useEffect(() => {
     if (!isBotTurn) return;
@@ -349,7 +299,7 @@ export default function TicTacToe({ shockSelection = false }) {
           className={!assignedSymbol ? "selected" : ""}
           onClick={() => assignPlayer(playerId, null)}
         >
-          None
+          Not Playing
         </button>
         {SYMBOLS.map((symbol) => (
           <button
@@ -357,7 +307,7 @@ export default function TicTacToe({ shockSelection = false }) {
             className={assignedSymbol === symbol ? "selected" : ""}
             onClick={() => assignPlayer(playerId, symbol)}
           >
-            {symbol}
+            {SYMBOL_LABELS[symbol]}
           </button>
         ))}
       </div>
@@ -392,10 +342,10 @@ export default function TicTacToe({ shockSelection = false }) {
 
           <div className="tictactoe-actions">
             <button onClick={startGame} className="tictactoe-action" disabled={Boolean(setupError)}>
-              Start
+              Start Game
             </button>
             <button onClick={() => navigate("/")} className="tictactoe-action secondary">
-              Back
+              Back to Shock
             </button>
           </div>
         </section>
@@ -418,42 +368,31 @@ export default function TicTacToe({ shockSelection = false }) {
         )}
       </section>
 
-      <div className="tictactoe-board-area" ref={boardAreaRef}>
-        <div
-          className="tictactoe-board"
-          aria-label="TicTacToe board"
-          style={{
-            "--tictactoe-board-size": `${boardLayout.size}px`,
-            "--tictactoe-board-gap": `${boardLayout.gap}px`,
-            "--tictactoe-board-padding": `${boardLayout.padding}px`,
-            "--tictactoe-cell-font-size": `${boardLayout.fontSize}px`,
-          }}
-        >
-          {board.map((cell, index) => (
-            <button
-              key={index}
-              className={`tictactoe-cell ${cell ? "filled" : ""} ${
-                gameResult.line.includes(index) ? "winning" : ""
-              }`}
-              onClick={() => handleCellClick(index)}
-              disabled={!gameStarted || isBotTurn || Boolean(cell) || gameResult.status !== "playing"}
-              aria-label={`Cell ${index + 1}${cell ? `, ${SYMBOL_LABELS[cell]}` : ""}`}
-            >
-              {cell}
-            </button>
-          ))}
-        </div>
+      <div className="tictactoe-board" aria-label="TicTacToe board">
+        {board.map((cell, index) => (
+          <button
+            key={index}
+            className={`tictactoe-cell ${cell ? "filled" : ""} ${
+              gameResult.line.includes(index) ? "winning" : ""
+            }`}
+            onClick={() => handleCellClick(index)}
+            disabled={!gameStarted || isBotTurn || Boolean(cell) || gameResult.status !== "playing"}
+            aria-label={`Cell ${index + 1}${cell ? `, ${SYMBOL_LABELS[cell]}` : ""}`}
+          >
+            {cell}
+          </button>
+        ))}
       </div>
 
       <div className="tictactoe-actions">
         <button onClick={resetGame} className="tictactoe-action">
-          New
+          New Game
         </button>
         <button onClick={returnToSetup} className="tictactoe-action secondary">
-          Teams
+          Team Selection
         </button>
         <button onClick={() => navigate("/")} className="tictactoe-action secondary">
-          Back
+          Back to Shock
         </button>
       </div>
     </div>
